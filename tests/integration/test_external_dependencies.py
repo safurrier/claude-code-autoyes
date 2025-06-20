@@ -37,18 +37,32 @@ def test_config_file_operations(temp_home_dir):
 
 
 @pytest.mark.integration
-def test_daemon_script_generation():
+def test_daemon_script_generation(temp_home_dir):
     """Test that daemon script generation works."""
     from claude_code_autoyes.core.daemon import DaemonManager
+    from claude_code_autoyes.core.config import ConfigManager
     
-    daemon = DaemonManager()
+    # Mock home directory for config file
+    import os
+    old_home = os.environ.get('HOME')
+    os.environ['HOME'] = str(temp_home_dir)
     
-    # Should be able to start daemon (which generates script internally)
-    # Just test that we can call start without crashing
-    result = daemon.start([])
-    
-    # Should return boolean result without crashing
-    assert isinstance(result, bool)
+    try:
+        daemon = DaemonManager()
+        config = ConfigManager()
+        
+        # Should be able to start daemon (which generates script internally)
+        # Just test that we can call start without crashing
+        result = daemon.start(config)
+        
+        # Should return boolean result without crashing
+        assert isinstance(result, bool)
+        
+    finally:
+        if old_home:
+            os.environ['HOME'] = old_home
+        else:
+            os.environ.pop('HOME', None)
 
 
 @pytest.mark.integration
