@@ -1,15 +1,19 @@
 """Integration tests for external dependencies (tmux, subprocess, filesystem)."""
 
+import os
 import pytest
 import subprocess
 import tempfile
 from pathlib import Path
 
+from claude_code_autoyes.core.detector import ClaudeDetector
+from claude_code_autoyes.core.config import ConfigManager
+from claude_code_autoyes.core.daemon import DaemonManager
+
 
 @pytest.mark.integration
 def test_tmux_detection_integration(isolated_tmux_server):
     """Test that tmux detection works with real tmux server."""
-    from claude_code_autoyes.core.detector import ClaudeDetector
     
     detector = ClaudeDetector()
     
@@ -23,7 +27,6 @@ def test_tmux_detection_integration(isolated_tmux_server):
 @pytest.mark.integration
 def test_config_file_operations(temp_home_dir):
     """Test that config file operations work correctly."""
-    from claude_code_autoyes.core.config import ConfigManager
     
     # Create config manager with temporary home directory
     config = ConfigManager()
@@ -39,11 +42,7 @@ def test_config_file_operations(temp_home_dir):
 @pytest.mark.integration
 def test_daemon_script_generation(temp_home_dir):
     """Test that daemon script generation works."""
-    from claude_code_autoyes.core.daemon import DaemonManager
-    from claude_code_autoyes.core.config import ConfigManager
-    
     # Mock home directory for config file
-    import os
     old_home = os.environ.get('HOME')
     os.environ['HOME'] = str(temp_home_dir)
     
@@ -68,7 +67,6 @@ def test_daemon_script_generation(temp_home_dir):
 @pytest.mark.integration
 def test_subprocess_calls_work():
     """Test that subprocess calls work correctly in new structure."""
-    from claude_code_autoyes.core.detector import ClaudeDetector
     
     detector = ClaudeDetector()
     
@@ -82,10 +80,7 @@ def test_subprocess_calls_work():
 @pytest.mark.integration  
 def test_file_system_operations(temp_home_dir):
     """Test that file system operations work correctly."""
-    from claude_code_autoyes.core.config import ConfigManager
-    
     # Mock home directory
-    import os
     old_home = os.environ.get('HOME')
     os.environ['HOME'] = str(temp_home_dir)
     

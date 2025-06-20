@@ -2,6 +2,7 @@
 
 import subprocess
 import tomli
+import yaml
 from pathlib import Path
 
 
@@ -44,8 +45,6 @@ def test_mkdocs_config_valid():
     mkdocs_config = Path("mkdocs.yml")
     if not mkdocs_config.exists():
         return  # Skip if docs not enabled
-        
-    import yaml
     
     with open(mkdocs_config, "r") as f:
         config = yaml.safe_load(f)
@@ -102,8 +101,6 @@ def test_github_actions_docs_workflow():
     workflow_path = Path(".github/workflows/docs.yml")
     if not workflow_path.exists():
         return  # Skip if docs not enabled
-    
-    import yaml
     with open(workflow_path, "r") as f:
         workflow = yaml.safe_load(f)
     

@@ -2,11 +2,12 @@
 
 import pytest
 
+from claude_code_autoyes.core.models import ClaudeInstance
+
 
 @pytest.mark.unit
 def test_claude_instance_creation():
     """Test ClaudeInstance model creation and attributes."""
-    from claude_code_autoyes.core.models import ClaudeInstance
     
     instance = ClaudeInstance(
         session="main",
@@ -26,7 +27,6 @@ def test_claude_instance_creation():
 @pytest.mark.unit
 def test_claude_instance_defaults():
     """Test ClaudeInstance default values."""
-    from claude_code_autoyes.core.models import ClaudeInstance
     
     instance = ClaudeInstance("session", "1", False)
     
@@ -37,7 +37,6 @@ def test_claude_instance_defaults():
 @pytest.mark.unit
 def test_claude_instance_equality():
     """Test ClaudeInstance equality comparison."""
-    from claude_code_autoyes.core.models import ClaudeInstance
     
     instance1 = ClaudeInstance("session", "0", True)
     instance2 = ClaudeInstance("session", "0", True)

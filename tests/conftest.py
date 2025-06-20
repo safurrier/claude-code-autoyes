@@ -4,6 +4,7 @@ import pytest
 import subprocess
 import tempfile
 import shutil
+import uuid
 from pathlib import Path
 from typing import Iterator
 
@@ -32,7 +33,6 @@ def project_root() -> Path:
 def isolated_tmux_server():
     """Create isolated tmux server for testing."""
     # Create unique socket name for test isolation
-    import uuid
     socket_name = f"test_claude_autoyes_{uuid.uuid4().hex[:8]}"
     
     # Start test tmux server
