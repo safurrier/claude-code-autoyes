@@ -7,13 +7,20 @@ authors = [
 ]
 requires-python = ">= 3.9"
 readme = "README.md"
-dependencies = []
+dependencies = [
+    "click>=8.1.7",
+    "textual>=0.89.0",
+]
+
+[project.scripts]
+claude-code-autoyes = "claude_code_autoyes.cli:cli"
 
 [project.optional-dependencies]
 dev = [
     "mypy>=1.9.0",
     "pytest>=8.1.1",
     "pytest-cov>=5.0.0",
+    "pytest-subprocess>=1.5.0",
     "ruff>=0.3.0",
     "pre-commit>=3.6.0",
     "tomli>=2.0.1",
@@ -35,4 +42,20 @@ dev = [
 [tool.hatch.build.targets.wheel]
 packages = [
     "claude_code_autoyes",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short --strict-markers"
+markers = [
+    "e2e: end-to-end tests",
+    "smoke: smoke tests",
+    "integration: integration tests", 
+    "unit: unit tests",
+]
+filterwarnings = [
+    "ignore::DeprecationWarning",
 ]
