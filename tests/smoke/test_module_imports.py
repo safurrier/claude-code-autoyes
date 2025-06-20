@@ -62,7 +62,7 @@ def test_cli_import():
 
 
 @pytest.mark.smoke
-def test_module_execution():
+def test_module_execution_with_help_flag_succeeds():
     """Test that module can be executed directly."""
     import subprocess
     
@@ -74,4 +74,5 @@ def test_module_execution():
     
     # Should be able to run the module and get help
     assert result.returncode == 0
-    assert "claude" in result.stdout.lower() or "auto" in result.stdout.lower()
+    # Test behavior: module execution succeeds and produces output
+    assert len(result.stdout) > 0

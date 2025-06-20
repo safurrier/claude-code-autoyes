@@ -67,7 +67,7 @@ def fake_claude_pane(isolated_tmux_server):
 
 
 @pytest.fixture
-def mock_config_file(temp_home_dir) -> Path:
+def test_config_file(temp_home_dir) -> Path:
     """Create temporary config file for testing."""
     config_path = temp_home_dir / ".claude-autoyes-config"
     config_content = """{
