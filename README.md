@@ -1,127 +1,143 @@
-![Code Quality Checks](https://github.com/safurrier/python-collab-template/workflows/Code%20Quality%20Checks/badge.svg) [![codecov](https://codecov.io/gh/safurrier/python-collab-template/branch/master/graph/badge.svg)](https://codecov.io/gh/safurrier/python-collab-template)
+# Claude Code AutoYes
 
-# Python Project Template
-
-A modern Python project template with best practices for development and collaboration.
+Interactive TUI for managing auto-yes across Claude instances in tmux. Never miss a Claude prompt again!
 
 ## Features
-- 🚀 Fast dependency management with [uv](https://github.com/astral-sh/uv)
-- ✨ Code formatting with [ruff](https://github.com/astral-sh/ruff)
-- 🔍 Type checking with [mypy](https://github.com/python/mypy)
-- 🧪 Testing with [pytest](https://github.com/pytest-dev/pytest)
-- 🐳 Docker support for development and deployment
-- 👷 CI/CD with GitHub Actions
 
-## Python Version
-This template requires Python 3.9 or higher and defaults to Python 3.12. To use a different version:
+- 🖥️ **Interactive TUI**: Beautiful terminal interface for managing Claude instances
+- 🔍 **Auto-Detection**: Automatically finds Claude instances running in tmux panes
+- ⚡ **Daemon Mode**: Background process to automatically respond to prompts
+- 🎯 **Selective Control**: Enable/disable auto-yes per Claude instance
+- 📊 **Real-time Status**: Live monitoring of Claude instances and their states
+- 🛠️ **Multiple Installation Options**: UV tool, UV script, or traditional pip
 
+## Installation
+
+### UV Tool (Recommended)
+Install as a global tool with uv:
 ```bash
-# List available Python versions
-uv python list
+# Install from GitHub
+uv tool install git+https://github.com/safurrier/claude-code-autoyes.git
 
-# Use a specific version (e.g., 3.11)
-make setup PYTHON_VERSION=3.11  # or UV_PYTHON_VERSION=3.11 make setup
-
-# View installed Python versions
-uv python list --installed
+# Or install locally
+git clone https://github.com/safurrier/claude-code-autoyes.git
+cd claude-code-autoyes
+uv tool install .
 ```
 
-uv will automatically download and manage Python versions as needed.
-
-## Quickstart
+### UV Script (Alternative)
 ```bash
-# Clone this repo and change directory
-git clone git@github.com:safurrier/python-collab-template.git my-project-name
-cd my-project-name
+# Download and run directly with UV
+curl -s https://raw.githubusercontent.com/safurrier/claude-code-autoyes/main/claude_code_autoyes.py | uv run --script -
 
-# Initialize a new project
-make init
-
-# Follow the prompts to configure your project
+# Or run locally
+git clone https://github.com/safurrier/claude-code-autoyes.git
+cd claude-code-autoyes
+uv run claude_code_autoyes.py
 ```
 
-This will:
-- Configure project metadata (name, description, author)
-- Handle example code (keep, simplify, or remove)
-- Initialize a fresh git repository
-- Set up development environment
-- Configure pre-commit hooks (optional, enabled by default)
-
-Pre-commit hooks will automatically run these checks before each commit:
-- Type checking (mypy)
-- Linting (ruff)
-- Formatting (ruff)
-- Tests (pytest)
-
-Alternatively, you can set up manually:
+### Development Installation
 ```bash
-# Install dependencies and set up the environment
+git clone https://github.com/safurrier/claude-code-autoyes.git
+cd claude-code-autoyes
 make setup
-
-# Run the suite of tests and checks
-make check
-
-# Optional: Remove example code to start fresh
-make clean-example
 ```
 
-## Development Commands
+## Usage
+
+### Installed as UV Tool
+```bash
+# Launch interactive TUI (default)
+claude-code-autoyes
+
+# Show current status
+claude-code-autoyes status
+
+# Enable auto-yes for all Claude instances
+claude-code-autoyes enable-all
+
+# Disable auto-yes for all instances
+claude-code-autoyes disable-all
+
+# Launch TUI explicitly
+claude-code-autoyes tui
+```
+
+### Running as Script
+```bash
+# UV script (portable)
+uv run claude_code_autoyes.py
+
+# Module execution
+uv run -m claude_code_autoyes
+
+# With specific commands
+uv run claude_code_autoyes.py status
+uv run -m claude_code_autoyes enable-all
+```
+
+## TUI Interface
+
+The interactive TUI provides:
+
+- **Table View**: All detected Claude instances with their status
+- **Quick Toggle**: Press 1-9 to quickly toggle individual instances
+- **Daemon Control**: Start/stop background daemon with 'd' key
+- **Bulk Operations**: Enable/disable all instances at once
+- **Real-time Updates**: Live status updates every few seconds
+
+### Keyboard Shortcuts
+- `↑↓`: Navigate instances
+- `Enter/Space`: Toggle selected instance
+- `1-9`: Quick toggle by number
+- `d`: Toggle daemon
+- `r`: Refresh
+- `q`: Quit
+
+## How It Works
+
+1. **Detection**: Scans tmux panes for Claude processes
+2. **Monitoring**: Tracks which instances need auto-yes responses
+3. **Automation**: Background daemon watches for prompts and responds automatically
+4. **Control**: Fine-grained control over which instances are automated
+
+## Development
 
 ### Quality Checks
 ```bash
 make check      # Run all checks (test, mypy, lint, format)
 make test       # Run tests with coverage
-make mypy       # Run type checking
-make lint       # Run linter
-make format     # Run code formatter
+make test-smoke # Fast module import tests
+make test-e2e   # CLI equivalence tests
 ```
 
-### Example Code
-The repository includes a simple example showing:
-- Type hints
-- Dataclasses
-- Unit tests
-- Modern Python practices
-
-To remove the example code and start fresh:
-```bash
-make clean-example
+### Project Structure
 ```
-## Docker Support
-
-### Development Environment
-```bash
-make dev-env    # Start a development container
-```
-
-This creates a container with:
-- All dependencies installed
-- Source code mounted (changes reflect immediately)
-- Development tools ready to use
-
-### Production Image
-```bash
-make build-image    # Build production image
-make push-image     # Push to container registry
+claude-code-autoyes/
+├── claude_code_autoyes/      # Main package
+│   ├── core/                 # Business logic
+│   │   ├── models.py        # Data models
+│   │   ├── detector.py      # Claude detection
+│   │   ├── config.py        # Configuration management
+│   │   └── daemon.py        # Background daemon
+│   ├── commands/            # CLI commands
+│   ├── cli.py              # Main CLI entry point
+│   ├── tui.py              # TUI application
+│   └── __main__.py         # Module execution
+├── tests/                   # Test suite
+│   ├── e2e/                # End-to-end tests
+│   ├── smoke/              # Smoke tests
+│   ├── integration/        # Integration tests
+│   └── unit/               # Unit tests
+└── claude_code_autoyes.py   # UV script wrapper
 ```
 
-## Project Structure
-```
-.
-├── src/                # Source code
-├── tests/             # Test files
-├── docker/            # Docker configuration
-├── .github/           # GitHub Actions workflows
-├── pyproject.toml     # Project configuration
-└── Makefile          # Development commands
-```
+## Requirements
 
-## Contributing
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Run `make check` to ensure all tests pass
-5. Submit a pull request
+- Python 3.9+
+- tmux (for Claude instance detection)
+- Claude Code instances running in tmux
 
 ## License
-This project is licensed under the MIT License - see the LICENSE file for details.
+
+MIT License - see LICENSE file for details.
