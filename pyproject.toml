@@ -1,0 +1,38 @@
+[project]
+name = "claude-code-autoyes"
+version = "0.1.0"
+description = "Simple to toggle autoyes across Claude Code sessions"
+authors = [
+    { name = "alex furrier", email = "safurrier@gmail.com" },
+]
+requires-python = ">= 3.9"
+readme = "README.md"
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+    "mypy>=1.9.0",
+    "pytest>=8.1.1",
+    "pytest-cov>=5.0.0",
+    "ruff>=0.3.0",
+    "pre-commit>=3.6.0",
+    "tomli>=2.0.1",
+    "tomli-w>=1.0.0",
+]
+
+[build-system]
+requires = [
+    "hatchling",
+]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "mkdocs-material>=9.6.14",
+    "mkdocstrings[python]>=0.26.1",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = [
+    "claude_code_autoyes",
+]
