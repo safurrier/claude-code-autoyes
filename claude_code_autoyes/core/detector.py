@@ -38,7 +38,7 @@ class ClaudeDetector:
 
             command, pid = parts
             return {"command": command, "pid": pid}
-        except:
+        except Exception:
             return {}
 
     def is_claude_process(self, process_info: Dict[str, str]) -> bool:
@@ -81,7 +81,7 @@ class ClaudeDetector:
                         return any(
                             indicator in full_command for indicator in claude_indicators
                         )
-            except:
+            except Exception:
                 pass
 
         return False
@@ -222,9 +222,9 @@ class ClaudeDetector:
                                         if time_match:
                                             last_prompt = time_match.group(1)
                                             break
-                                    except:
+                                    except Exception:
                                         pass
-                    except:
+                    except Exception:
                         pass
 
                 instance = ClaudeInstance(

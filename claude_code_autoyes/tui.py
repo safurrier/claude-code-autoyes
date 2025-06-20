@@ -282,7 +282,7 @@ class ClaudeAutoYesApp(App):
 
     def update_daemon_status(self) -> None:
         """Update the daemon status display."""
-        status_bar = self.query_one("#status-bar")
+        status_bar = self.query_one("#status-bar", Static)
         status_bar.update(self.daemon.get_status())
 
     def update_table(self) -> None:
@@ -404,14 +404,14 @@ class ClaudeAutoYesApp(App):
         else:
             if self.daemon.start(self.config):
                 self.update_daemon_status()
-                self.notify("Daemon started", severity="success")
+                self.notify("Daemon started")
             else:
                 self.notify("Failed to start daemon", severity="error")
 
     def on_data_table_row_selected(self, event: DataTable.RowSelected) -> None:
         """Handle row selection (Enter key) to toggle instance."""
         if event.row_key is not None:
-            instance_index = int(event.row_key.value)
+            instance_index = int(str(event.row_key.value))
             if 0 <= instance_index < len(self.instances):
                 instance = self.instances[instance_index]
                 pane_id = f"{instance.session}:{instance.pane}"

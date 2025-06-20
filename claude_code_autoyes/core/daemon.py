@@ -202,7 +202,7 @@ done
                 with open(self.pid_file, "r") as f:
                     pid = f.read().strip()
                 return f"✓ Daemon: Running (PID: {pid})"
-            except:
+            except Exception:
                 return "✓ Daemon: Running"
         else:
             return "✗ Daemon: Not running"
