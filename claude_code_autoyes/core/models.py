@@ -1,7 +1,6 @@
 """Data models for claude-code-autoyes."""
 
 from dataclasses import dataclass
-from typing import Optional
 
 
 @dataclass
@@ -11,5 +10,5 @@ class ClaudeInstance:
     session: str
     pane: str
     is_claude: bool
-    last_prompt: Optional[str] = None
+    last_prompt: str | None = None
     enabled: bool = False

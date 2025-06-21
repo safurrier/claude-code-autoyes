@@ -2,10 +2,9 @@
 
 import logging
 import os
-from typing import Optional
 
 
-def setup_logger(name: str, log_file: Optional[str] = None) -> logging.Logger:
+def setup_logger(name: str, log_file: str | None = None) -> logging.Logger:
     """Set up a logger with consistent formatting and configuration.
 
     Args:

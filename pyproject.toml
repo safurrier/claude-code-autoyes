@@ -5,7 +5,7 @@ description = "Simple to toggle autoyes across Claude Code sessions"
 authors = [
     { name = "alex furrier", email = "safurrier@gmail.com" },
 ]
-requires-python = ">= 3.9"
+requires-python = ">= 3.10"
 readme = "README.md"
 dependencies = [
     "click>=8.1.7",
@@ -59,3 +59,48 @@ markers = [
 filterwarnings = [
     "ignore::DeprecationWarning",
 ]
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+
+[tool.ruff.lint]
+select = [
+    "E",      # pycodestyle errors
+    "W",      # pycodestyle warnings  
+    "F",      # pyflakes
+    "I",      # isort
+    "B",      # flake8-bugbear
+    "C4",     # flake8-comprehensions
+    "UP",     # pyupgrade
+    "TID",    # flake8-tidy-imports
+    "E402",   # module-import-not-at-top-of-file
+]
+
+ignore = [
+    "E501",   # line too long (handled by line-length)
+    "TID252", # prefer absolute imports (keep relative for internal imports)
+]
+
+[tool.ruff.lint.flake8-tidy-imports]
+# Prevent specific problematic imports
+banned-api = {}
+
+[tool.ruff.lint.isort]
+known-first-party = ["claude_code_autoyes"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true

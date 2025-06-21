@@ -71,6 +71,7 @@ markdown_extensions:
 nav:
   - Home: index.md
   - Getting Started: getting-started.md
+  - Development: development.md
   - Reference:
     - API Documentation: reference/api.md
 
