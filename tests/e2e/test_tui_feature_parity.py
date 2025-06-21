@@ -68,7 +68,7 @@ def test_theme_system_loads_without_errors(project_root):
     """Test that theme system can be imported and initialized."""
     result = subprocess.run(
         ["uv", "run", "python", "-c",
-         "from claude_code_autoyes.tui.themes import Theme; Theme.get_default(); print('Theme system OK')"],
+         "from claude_code_autoyes.tui.themes import THEMES; print(f'Theme system OK: {list(THEMES.keys())}')"],
         capture_output=True,
         text=True,
         cwd=project_root

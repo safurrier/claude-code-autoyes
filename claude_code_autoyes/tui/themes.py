@@ -1,76 +1,100 @@
-"""Theme system for the modular TUI."""
+"""Theme system for claude-code-autoyes TUI."""
 
 from dataclasses import dataclass, field
+
+from textual.design import ColorSystem
 
 
 @dataclass
 class Theme:
-    """Theme configuration with semantic color names and CSS variables."""
+    """Theme configuration for the TUI."""
 
-    # Core semantic colors
-    primary: str = "#fe8c69"  # Orange accent (galaxy theme inspired)
+    primary: str
     secondary: str | None = None
-    accent: str = "#fea64b"  # Orange accent
-    background: str = "#121212"  # Dark background
-    surface: str = "#1e1e1e"  # Slightly lighter surface
-    panel: str = "#2a2a2a"  # Panel background
-    foreground: str = "#ffffff"  # Text color
-
-    # Status colors
-    success: str = "#4ade80"
-    warning: str = "#fbbf24"
-    error: str = "#f87171"
-
-    # Theme metadata
-    name: str = "default"
+    warning: str | None = None
+    error: str | None = None
+    success: str | None = None
+    accent: str | None = None
+    foreground: str | None = None
+    background: str | None = None
+    surface: str | None = None
+    panel: str | None = None
+    boost: str | None = None
     dark: bool = True
-
-    # Additional CSS variables
+    luminosity_spread: float = 0.15
+    text_alpha: float = 0.95
     variables: dict[str, str] = field(default_factory=dict)
 
-    @classmethod
-    def get_default(cls) -> "Theme":
-        """Get the default Bagels-inspired theme."""
-        return cls(
-            name="bagels_default",
-            primary="#fe8c69",
-            accent="#fea64b",
-            background="#121212",
-            surface="#1e1e1e",
-            panel="#2a2a2a",
-            foreground="#ffffff",
-            success="#4ade80",
-            warning="#fbbf24",
-            error="#f87171",
-            variables={
-                "accent-lighten-1": "#feb676",
-                "accent-darken-1": "#fd8020",
-                "surface-lighten-1": "#2a2a2a",
-                "surface-darken-1": "#161616",
-                "panel-lighten-1": "#363636",
-                "panel-darken-1": "#1e1e1e",
-            },
-        )
-
-    def to_css_variables(self) -> dict[str, str]:
-        """Convert theme to CSS variable dictionary."""
-        css_vars = {
+    def to_color_system(self) -> ColorSystem:
+        """Convert this theme to a ColorSystem."""
+        theme_dict = {
             "primary": self.primary,
+            "secondary": self.secondary,
+            "warning": self.warning,
+            "error": self.error,
+            "success": self.success,
             "accent": self.accent,
+            "foreground": self.foreground,
             "background": self.background,
             "surface": self.surface,
             "panel": self.panel,
-            "foreground": self.foreground,
-            "success": self.success,
-            "warning": self.warning,
-            "error": self.error,
+            "boost": self.boost,
+            "dark": self.dark,
+            "luminosity_spread": self.luminosity_spread,
+            "text_alpha": self.text_alpha,
+            "variables": self.variables,
         }
+        # Remove None values
+        theme_dict = {k: v for k, v in theme_dict.items() if v is not None}
+        return ColorSystem(**theme_dict)
 
-        # Add optional colors if defined
-        if self.secondary:
-            css_vars["secondary"] = self.secondary
 
-        # Add custom variables
-        css_vars.update(self.variables)
-
-        return css_vars
+# Available themes
+THEMES: dict[str, Theme] = {
+    "default": Theme(
+        primary="#fe8c69",
+        secondary="#fea64b",
+        accent="#ffa62b",
+        warning="#ffa500",
+        error="#ff4500",
+        success="#00fa9a",
+        foreground="#ffffff",
+        background="#121212",
+        surface="#1e1e1e",
+        panel="#2a2a2a",
+        variables={
+            "button-color-foreground": "#121212",
+        },
+    ),
+    "dark": Theme(
+        primary="#0178d4",
+        secondary="#004578",
+        accent="#ffa62b",
+        warning="#ffa62b",
+        error="#ba3c5b",
+        success="#4ebf71",
+        foreground="#e0e0e0",
+        background="#0f0f0f",
+        surface="#1a1a1a",
+        panel="#262626",
+        variables={
+            "button-color-foreground": "#0f0f0f",
+        },
+    ),
+    "galaxy": Theme(
+        primary="#8A2BE2",
+        secondary="#a684e8",
+        warning="#FFD700",
+        error="#FF4500",
+        success="#00FA9A",
+        accent="#FF69B4",
+        dark=True,
+        background="#0F0F1F",
+        surface="#1E1E3F",
+        panel="#2D2B55",
+        foreground="#e0e0e0",
+        variables={
+            "button-color-foreground": "#0F0F1F",
+        },
+    ),
+}

@@ -3,6 +3,7 @@
 from typing import Any
 
 from textual.app import App, ComposeResult
+from textual.reactive import reactive
 from textual.widgets import Button
 
 from ..core.config import ConfigManager
@@ -10,7 +11,7 @@ from ..core.daemon import DaemonManager
 from ..core.detector import ClaudeDetector
 from .components import InstanceTable
 from .pages import MainPage
-from .themes import Theme
+from .themes import THEMES
 
 
 class ClaudeAutoYesNewApp(App[None]):
@@ -25,6 +26,7 @@ class ClaudeAutoYesNewApp(App[None]):
         ("1,2,3,4,5,6,7,8,9", "quick_toggle", "Quick Toggle"),
         ("d", "toggle_daemon", "Toggle Daemon"),
         ("r", "refresh", "Refresh"),
+        ("t", "cycle_theme", "Cycle Theme"),
         ("q", "quit", "Quit"),
     ]
 
@@ -33,6 +35,9 @@ class ClaudeAutoYesNewApp(App[None]):
         background: $background;
     }
     """
+
+    # Theme reactive - follows Bagels pattern
+    app_theme: reactive[str] = reactive("default", init=False)
 
     def __init__(
         self,
@@ -45,13 +50,29 @@ class ClaudeAutoYesNewApp(App[None]):
         self.detector = detector or ClaudeDetector()
         self.config = config or ConfigManager()
         self.daemon = daemon or DaemonManager()
-        self._theme = Theme.get_default()
+        self.themes = THEMES
 
     def get_css_variables(self) -> dict[str, str]:
-        """Apply theme CSS variables."""
-        if not hasattr(self, "_theme"):
-            self._theme = Theme.get_default()
-        return {**super().get_css_variables(), **self._theme.to_css_variables()}
+        """Apply theme CSS variables - Bagels pattern."""
+        if self.app_theme:
+            theme = self.themes.get(self.app_theme)
+            if theme:
+                color_system = theme.to_color_system().generate()
+            else:
+                color_system = {}
+        else:
+            color_system = {}
+        return {**super().get_css_variables(), **color_system}
+
+    def watch_app_theme(self, theme: str | None) -> None:
+        """Handle theme changes - Bagels pattern."""
+        self.refresh_css(animate=False)
+        self.screen._update_styles()
+        if theme:
+            if theme in self.themes:
+                self.notify(f"Theme changed to {theme}", timeout=1.5)
+            else:
+                self.notify(f"Theme {theme!r} not found", timeout=1.5)
 
     def compose(self) -> ComposeResult:
         """Compose the modular TUI interface."""
@@ -177,6 +198,15 @@ class ClaudeAutoYesNewApp(App[None]):
         pane_id = instance_table.toggle_selected()
         if pane_id:
             self.notify(f"Toggled {pane_id}")
+
+    def action_cycle_theme(self) -> None:
+        """Cycle through available themes."""
+        theme_names = list(self.themes.keys())
+        current_index = (
+            theme_names.index(self.app_theme) if self.app_theme in theme_names else 0
+        )
+        next_index = (current_index + 1) % len(theme_names)
+        self.app_theme = theme_names[next_index]
 
     async def action_quit(self) -> None:
         """Quit the application safely."""
