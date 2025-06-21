@@ -2,12 +2,12 @@
 
 import click
 
-from .commands import status, enable_all, disable_all, tui, daemon
+from .commands import daemon, disable_all, enable_all, status, tui
 
 
 @click.group(invoke_without_command=True)
 @click.pass_context
-def cli(ctx):
+def cli(ctx: click.Context) -> None:
     """Interactive TUI for managing auto-yes across Claude instances in tmux."""
     if ctx.invoked_subcommand is None:
         # Default to TUI if no subcommand

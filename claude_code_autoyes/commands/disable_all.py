@@ -6,7 +6,7 @@ from ..core import ConfigManager
 
 
 @click.command("disable-all")
-def disable_all():
+def disable_all() -> None:
     """Disable auto-yes for all Claude instances."""
     config = ConfigManager()
     config.disable_all()

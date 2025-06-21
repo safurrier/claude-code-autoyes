@@ -2,12 +2,14 @@
 
 from textual.app import App, ComposeResult
 from textual.containers import Container
+from textual.events import Key
 from textual.widgets import Button, DataTable, Header, Static
 
 from .core import ClaudeDetector, ConfigManager, DaemonManager
+from .core.models import ClaudeInstance
 
 
-class ClaudeAutoYesApp(App):
+class ClaudeAutoYesApp(App[None]):
     """Main Textual TUI application."""
 
     TITLE = "Claude Auto YES"
@@ -209,12 +211,12 @@ class ClaudeAutoYesApp(App):
     }
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.detector = ClaudeDetector()
         self.config = ConfigManager()
         self.daemon = DaemonManager()
-        self.instances = []
+        self.instances: list[ClaudeInstance] = []
 
     def compose(self) -> ComposeResult:
         # Header
@@ -440,7 +442,7 @@ class ClaudeAutoYesApp(App):
             self.refresh_instances()
             self.notify(f"Toggled {pane_id}")
 
-    def on_key(self, event) -> None:
+    def on_key(self, event: Key) -> None:
         """Handle other keyboard shortcuts."""
         # Fallback for any other keys
         pass

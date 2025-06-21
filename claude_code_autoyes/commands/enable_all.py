@@ -6,7 +6,7 @@ from ..core import ClaudeDetector, ConfigManager
 
 
 @click.command("enable-all")
-def enable_all():
+def enable_all() -> None:
     """Enable auto-yes for all Claude instances."""
     detector = ClaudeDetector()
     config = ConfigManager()

@@ -3,16 +3,27 @@
 import re
 import subprocess
 from datetime import datetime
-from typing import Dict, List
 
 from .models import ClaudeInstance
 
 
 class ClaudeDetector:
-    """Detects Claude instances in tmux panes."""
+    """Detects Claude instances in tmux panes.
 
-    def get_pane_process_info(self, pane_id: str) -> Dict[str, str]:
-        """Get process information for a tmux pane."""
+    Provides methods to discover running Claude instances in tmux sessions
+    by analyzing process information and pane content. Uses both process-based
+    detection (preferred) and content-based detection (fallback).
+    """
+
+    def get_pane_process_info(self, pane_id: str) -> dict[str, str]:
+        """Get process information for a tmux pane.
+
+        Args:
+            pane_id: Tmux pane identifier (e.g., "session:window.pane")
+
+        Returns:
+            Dictionary with 'command' and 'pid' keys, or empty dict if failed.
+        """
         try:
             # Get current command and PID
             result = subprocess.run(
@@ -38,11 +49,18 @@ class ClaudeDetector:
 
             command, pid = parts
             return {"command": command, "pid": pid}
-        except Exception:
+        except (subprocess.SubprocessError, ValueError, OSError):
             return {}
 
-    def is_claude_process(self, process_info: Dict[str, str]) -> bool:
-        """Check if a process is a Claude instance based on process info."""
+    def is_claude_process(self, process_info: dict[str, str]) -> bool:
+        """Check if a process is a Claude instance based on process info.
+
+        Args:
+            process_info: Dictionary with command and pid information.
+
+        Returns:
+            True if the process appears to be a Claude instance.
+        """
         if not process_info:
             return False
 
@@ -81,7 +99,7 @@ class ClaudeDetector:
                         return any(
                             indicator in full_command for indicator in claude_indicators
                         )
-            except Exception:
+            except (subprocess.SubprocessError, OSError):
                 pass
 
         return False
@@ -111,7 +129,7 @@ class ClaudeDetector:
 
         return any(prompt in content for prompt in prompts)
 
-    def get_tmux_sessions(self) -> List[str]:
+    def get_tmux_sessions(self) -> list[str]:
         """Get list of tmux session names."""
         try:
             result = subprocess.run(
@@ -129,7 +147,7 @@ class ClaudeDetector:
         except (subprocess.SubprocessError, FileNotFoundError):
             return []
 
-    def get_tmux_panes(self) -> List[str]:
+    def get_tmux_panes(self) -> list[str]:
         """Get list of all tmux panes in format session:window.pane."""
         try:
             result = subprocess.run(
@@ -170,8 +188,15 @@ class ClaudeDetector:
         except (subprocess.SubprocessError, FileNotFoundError):
             return ""
 
-    def find_claude_instances(self) -> List[ClaudeInstance]:
-        """Find all Claude instances in tmux panes."""
+    def find_claude_instances(self) -> list[ClaudeInstance]:
+        """Find all Claude instances in tmux panes.
+
+        Scans all tmux panes and identifies which ones contain Claude instances.
+        Uses process-based detection first, falls back to content analysis.
+
+        Returns:
+            List of ClaudeInstance objects representing detected instances.
+        """
         instances = []
         panes = self.get_tmux_panes()
 
@@ -222,9 +247,9 @@ class ClaudeDetector:
                                         if time_match:
                                             last_prompt = time_match.group(1)
                                             break
-                                    except Exception:
+                                    except (AttributeError, ValueError):
                                         pass
-                    except Exception:
+                    except (subprocess.SubprocessError, OSError, FileNotFoundError):
                         pass
 
                 instance = ClaudeInstance(

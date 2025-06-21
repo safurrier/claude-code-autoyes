@@ -6,7 +6,7 @@ from ..core import ClaudeDetector, ConfigManager
 
 
 @click.command()
-def status():
+def status() -> None:
     """Show current status of Claude instances."""
     detector = ClaudeDetector()
     config = ConfigManager()

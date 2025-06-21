@@ -6,7 +6,7 @@ from ..tui import ClaudeAutoYesApp
 
 
 @click.command()
-def tui():
+def tui() -> None:
     """Launch interactive TUI."""
     app = ClaudeAutoYesApp()
     app.run()

@@ -3,20 +3,24 @@
 import re
 import subprocess
 import time
-from typing import Optional
-from .logging_config import get_daemon_logger
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .config import ConfigManager
+
 from .constants import (
+    CLAUDE_PROMPT_PATTERNS,
     DEFAULT_SLEEP_INTERVAL,
     PROMPT_RESPONSE_PAUSE,
-    CLAUDE_PROMPT_PATTERNS,
     TMUX_CAPTURE_LINES,
 )
+from .logging_config import get_daemon_logger
 
 
 class PromptDetector:
     """Detects Claude prompts in tmux pane content using regex patterns."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.patterns = CLAUDE_PROMPT_PATTERNS
 
     def detect_claude_prompt(self, content: str) -> bool:
@@ -34,14 +38,18 @@ class PromptDetector:
 class DaemonService:
     """Simple synchronous daemon service - direct Python translation of bash logic."""
 
-    def __init__(self, config_manager, sleep_interval: float = DEFAULT_SLEEP_INTERVAL):
+    def __init__(
+        self,
+        config_manager: "ConfigManager",
+        sleep_interval: float = DEFAULT_SLEEP_INTERVAL,
+    ) -> None:
         self.config = config_manager
         self.running = False
         self.prompt_detector = PromptDetector()
         self.sleep_interval = sleep_interval
         self.logger = get_daemon_logger()
 
-    def start_monitoring_loop(self, max_iterations: Optional[int] = None):
+    def start_monitoring_loop(self, max_iterations: int | None = None) -> None:
         """Simple synchronous monitoring loop - equivalent to bash while loop.
 
         Args:
@@ -61,14 +69,18 @@ class DaemonService:
                     break
 
                 time.sleep(self.sleep_interval)
-            except Exception as e:
+            except (OSError, subprocess.SubprocessError, ValueError) as e:
                 self.logger.error(f"Monitor error: {e}")
+            except KeyboardInterrupt:
+                self.logger.info("Daemon interrupted by user")
+                self.stop()
+                break
 
-    def stop(self):
+    def stop(self) -> None:
         """Stop the monitoring loop."""
         self.running = False
 
-    def _check_enabled_sessions(self):
+    def _check_enabled_sessions(self) -> None:
         """Check all enabled sessions for prompts - equivalent to bash for loop."""
         for session_pane in self.config.enabled_sessions:
             if self._session_exists(session_pane):

@@ -2,18 +2,18 @@
 
 import click
 
-from ..core.daemon import DaemonManager
 from ..core.config import ConfigManager
+from ..core.daemon import DaemonManager
 
 
 @click.group()
-def daemon():
+def daemon() -> None:
     """Manage the auto-yes daemon."""
     pass
 
 
 @daemon.command()
-def start():
+def start() -> None:
     """Start the auto-yes daemon."""
     config = ConfigManager()
     daemon_manager = DaemonManager()
@@ -30,7 +30,7 @@ def start():
 
 
 @daemon.command()
-def stop():
+def stop() -> None:
     """Stop the auto-yes daemon."""
     daemon_manager = DaemonManager()
 
@@ -46,14 +46,14 @@ def stop():
 
 
 @daemon.command()
-def status():
+def status() -> None:
     """Show daemon status."""
     daemon_manager = DaemonManager()
     click.echo(daemon_manager.get_status())
 
 
 @daemon.command()
-def restart():
+def restart() -> None:
     """Restart the auto-yes daemon."""
     daemon_manager = DaemonManager()
     config = ConfigManager()
