@@ -51,6 +51,18 @@ clean: clean-pyc clean-test clean-venv
 test: setup  # Run pytest with coverage
 	uv run -m pytest tests --cov=$(MODULE_NAME) --cov-report=term-missing
 
+test-smoke: setup  # Run smoke tests only (fast)
+	uv run -m pytest tests/smoke/ -v -x
+
+test-e2e: setup  # Run end-to-end tests
+	uv run -m pytest tests/e2e/ -v
+
+test-integration: setup  # Run integration tests  
+	uv run -m pytest tests/integration/ -v
+
+test-unit: setup  # Run unit tests
+	uv run -m pytest tests/unit/ -v
+
 mypy: setup  # Run type checking
 	uv run -m mypy $(MODULE_NAME)
 
