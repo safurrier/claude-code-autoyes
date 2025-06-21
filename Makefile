@@ -1,7 +1,33 @@
 .PHONY: compile-deps setup clean-pyc clean-test clean-venv clean test mypy lint format check clean-example docs-install docs-build docs-serve docs-check docs-clean dev-env refresh-containers rebuild-images build-image push-image
+.PHONY: dev-install dev-uninstall dev-test-pr dev-run dev-daemon-test dev-logs dev-daemon-stop dev-status dev-tmux-setup
 
 # Module name - will be updated by init script
 MODULE_NAME := claude_code_autoyes
+
+help:  ## Show this help message
+	@echo "📚 Available Make Commands"
+	@echo "=========================="
+	@echo ""
+	@echo "🏗️  Setup & Dependencies:"
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | grep -E "(setup|install|compile)" | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'
+	@echo ""
+	@echo "🧪 Testing & Quality:"
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | grep -E "(test|mypy|lint|format|check)" | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'
+	@echo ""
+	@echo "📖 Documentation:"
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | grep -E "docs-" | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'
+	@echo ""
+	@echo "🔧 Development & Testing:"
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | grep -E "dev-" | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'
+	@echo ""
+	@echo "🧹 Cleanup:"
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | grep -E "clean" | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'
+	@echo ""
+	@echo "💡 Quick Start for PR Testing:"
+	@echo "  make dev-test-pr PR=4    # Test PR #4"
+	@echo "  make dev-daemon-test     # Test daemon functionality"
+	@echo "  make dev-logs           # Watch daemon logs"
+	@echo "  make dev-uninstall      # Clean up"
 
 # Development Setup
 #################
@@ -160,3 +186,94 @@ build-image:
 push-image: build-image
 	@echo Pushing image to container registry
 	@docker push ${IMAGE_NAME}:${IMAGE_TAG}
+
+# Development & Testing Commands
+###############################
+TOOL_NAME = claude-code-autoyes-test
+
+dev-install: setup  ## Install current branch as test tool
+	@echo "Installing current branch as $(TOOL_NAME)..."
+	uv tool install --from . --force-reinstall --name $(TOOL_NAME) claude-code-autoyes
+	@echo "✅ Installed as $(TOOL_NAME)"
+	@echo "💡 Usage: $(TOOL_NAME) --help"
+
+dev-uninstall:  ## Remove test tool installation
+	@echo "Uninstalling $(TOOL_NAME)..."
+	uv tool uninstall $(TOOL_NAME) || echo "Tool not installed"
+	@echo "✅ Uninstalled $(TOOL_NAME)"
+
+dev-test-pr:  ## Test a specific PR (usage: make dev-test-pr PR=4)
+	@if [ -z "$(PR)" ]; then \
+		echo "❌ Please specify PR number: make dev-test-pr PR=4"; \
+		exit 1; \
+	fi
+	@echo "🔄 Fetching PR $(PR)..."
+	git fetch origin pull/$(PR)/head:test-pr-$(PR)
+	git checkout test-pr-$(PR)
+	@echo "📦 Installing PR $(PR) as test tool..."
+	$(MAKE) dev-install
+	@echo "✅ PR $(PR) ready for testing"
+	@echo "💡 Run: $(TOOL_NAME) --help"
+	@echo "🧹 Clean up with: make dev-uninstall && git checkout main"
+
+dev-run:  ## Run current code without installing
+	@echo "🚀 Running current code directly..."
+	uv run claude-code-autoyes.py --help
+	@echo ""
+	@echo "💡 Available commands:"
+	@echo "  uv run claude-code-autoyes.py status"
+	@echo "  uv run -m claude_code_autoyes status"
+
+dev-status:  ## Show current development status
+	@echo "📋 Development Status"
+	@echo "====================="
+	@echo "📂 Current branch: $$(git branch --show-current)"
+	@echo "🔄 Git status:"
+	@git status --porcelain | head -10
+	@echo ""
+	@echo "🔧 Tool installations:"
+	@uv tool list | grep claude-code-autoyes || echo "  No test tools installed"
+	@echo ""
+	@echo "📊 Daemon status:"
+	@$(TOOL_NAME) status 2>/dev/null || uv run claude-code-autoyes.py status
+
+dev-tmux-setup:  ## Set up test tmux session for daemon testing
+	@echo "🖥️  Setting up test tmux session..."
+	@if ! command -v tmux >/dev/null 2>&1; then \
+		echo "❌ tmux not found. Install with: brew install tmux"; \
+		exit 1; \
+	fi
+	tmux kill-session -t claude-test 2>/dev/null || true
+	tmux new-session -d -s claude-test -x 120 -y 30
+	tmux send-keys -t claude-test 'echo "Test session ready for Claude auto-yes testing"' Enter
+	@echo "✅ Test tmux session 'claude-test' created"
+	@echo "💡 Attach with: tmux attach -t claude-test"
+	@echo "🧹 Clean up with: tmux kill-session -t claude-test"
+
+dev-daemon-test: dev-tmux-setup  ## Test daemon with simulated prompts
+	@echo "🤖 Testing daemon with simulated prompts..."
+	@echo "🚀 Starting daemon (if not running)..."
+	@$(TOOL_NAME) enable-all || true
+	@$(TOOL_NAME) daemon start || true
+	@echo "📋 Daemon status:"
+	@$(TOOL_NAME) daemon status
+	@echo ""
+	@echo "🔍 To test manually:"
+	@echo "  1. tmux attach -t claude-test"
+	@echo "  2. ./scripts/simulate-claude-prompt.sh"
+	@echo "  3. Watch for auto-response in: make dev-logs"
+
+dev-logs:  ## Tail daemon logs
+	@echo "📄 Tailing daemon logs (Ctrl+C to stop)..."
+	@if [ -f /tmp/claude-autoyes.log ]; then \
+		tail -f /tmp/claude-autoyes.log; \
+	else \
+		echo "❌ No log file found at /tmp/claude-autoyes.log"; \
+		echo "💡 Start daemon with: $(TOOL_NAME) daemon start"; \
+	fi
+
+dev-daemon-stop:  ## Stop daemon and clean up test session
+	@echo "🛑 Stopping daemon and cleaning up..."
+	@$(TOOL_NAME) daemon stop 2>/dev/null || echo "Daemon not running"
+	@tmux kill-session -t claude-test 2>/dev/null || echo "Test session not found"
+	@echo "✅ Cleanup complete"
