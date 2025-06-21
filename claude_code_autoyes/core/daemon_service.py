@@ -3,20 +3,21 @@
 import re
 import subprocess
 import time
-import logging
 from typing import Optional
+from .logging_config import get_daemon_logger
+from .constants import (
+    DEFAULT_SLEEP_INTERVAL,
+    PROMPT_RESPONSE_PAUSE,
+    CLAUDE_PROMPT_PATTERNS,
+    TMUX_CAPTURE_LINES,
+)
 
 
 class PromptDetector:
     """Detects Claude prompts in tmux pane content using regex patterns."""
 
     def __init__(self):
-        self.patterns = [
-            r"Do you want to",
-            r"Would you like to",
-            r"Proceed\?",
-            r"❯ 1\. Yes",
-        ]
+        self.patterns = CLAUDE_PROMPT_PATTERNS
 
     def detect_claude_prompt(self, content: str) -> bool:
         """Check if content contains Claude prompt patterns."""
@@ -33,11 +34,12 @@ class PromptDetector:
 class DaemonService:
     """Simple synchronous daemon service - direct Python translation of bash logic."""
 
-    def __init__(self, config_manager, sleep_interval: float = 3.0):
+    def __init__(self, config_manager, sleep_interval: float = DEFAULT_SLEEP_INTERVAL):
         self.config = config_manager
         self.running = False
         self.prompt_detector = PromptDetector()
-        self.sleep_interval = sleep_interval  # Dependency injection for testability
+        self.sleep_interval = sleep_interval
+        self.logger = get_daemon_logger()
 
     def start_monitoring_loop(self, max_iterations: Optional[int] = None):
         """Simple synchronous monitoring loop - equivalent to bash while loop.
@@ -58,9 +60,9 @@ class DaemonService:
                     self.stop()
                     break
 
-                time.sleep(self.sleep_interval)  # Use injected interval
+                time.sleep(self.sleep_interval)
             except Exception as e:
-                self._log_error(f"Monitor error: {e}")
+                self.logger.error(f"Monitor error: {e}")
 
     def stop(self):
         """Stop the monitoring loop."""
@@ -73,8 +75,8 @@ class DaemonService:
                 content = self._capture_pane_content(session_pane)
                 if self.prompt_detector.detect_claude_prompt(content):
                     if self._send_enter_key(session_pane):
-                        self._log_info(f"Sent Enter to {session_pane}")
-                        time.sleep(2)  # Same pause as bash version
+                        self.logger.info(f"Sent Enter to {session_pane}")
+                        time.sleep(PROMPT_RESPONSE_PAUSE)
 
     def _session_exists(self, session_pane: str) -> bool:
         """Check if tmux session exists - equivalent to tmux has-session."""
@@ -91,7 +93,15 @@ class DaemonService:
         """Capture tmux pane content - equivalent to tmux capture-pane."""
         try:
             result = subprocess.run(
-                ["tmux", "capture-pane", "-p", "-t", session_pane, "-S", "-10"],
+                [
+                    "tmux",
+                    "capture-pane",
+                    "-p",
+                    "-t",
+                    session_pane,
+                    "-S",
+                    TMUX_CAPTURE_LINES,
+                ],
                 capture_output=True,
                 text=True,
             )
@@ -108,11 +118,3 @@ class DaemonService:
             return result.returncode == 0
         except subprocess.SubprocessError:
             return False
-
-    def _log_info(self, message: str):
-        """Log info message - equivalent to bash log_msg function."""
-        logging.info(f"[DaemonService] {message}")
-
-    def _log_error(self, message: str):
-        """Log error message - equivalent to bash log_msg function."""
-        logging.error(f"[DaemonService] {message}")

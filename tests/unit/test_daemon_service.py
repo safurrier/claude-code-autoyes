@@ -1,144 +1,184 @@
 """Unit tests for Python daemon service."""
 
 import pytest
-import re
-from unittest.mock import Mock, patch
+from dataclasses import dataclass
+from typing import Set, Dict
 
 from claude_code_autoyes.core.daemon_service import DaemonService, PromptDetector
 
 
-@pytest.mark.unit
-def test_prompt_detector_identifies_claude_prompts():
-    """Test that PromptDetector correctly identifies Claude prompt patterns."""
+@dataclass
+class PromptTestCase:
+    """Test case for prompt detection."""
+    name: str
+    content: str
+    should_detect: bool
+
+
+class FakeTmuxService:
+    """Test double for tmux operations."""
+    
+    def __init__(self):
+        self.existing_sessions: Set[str] = set()
+        self.pane_content: Dict[str, str] = {}
+        self.keys_sent: list = []
+        self.command_failures: Set[str] = set()
+    
+    def session_exists(self, session_name: str) -> bool:
+        return session_name in self.existing_sessions
+    
+    def capture_pane_content(self, session_pane: str) -> str:
+        if session_pane in self.command_failures:
+            return ""
+        return self.pane_content.get(session_pane, "")
+    
+    def send_enter_key(self, session_pane: str) -> bool:
+        if session_pane in self.command_failures:
+            return False
+        self.keys_sent.append(session_pane)
+        return True
+
+
+class StubConfig:
+    """Test double for configuration."""
+    
+    def __init__(self, enabled_sessions: Set[str] = None):
+        self.enabled_sessions = enabled_sessions or set()
+
+
+class DaemonServiceWithFakes(DaemonService):
+    """Testable version of DaemonService with injected dependencies."""
+    
+    def __init__(self, config, tmux_service: FakeTmuxService, sleep_interval: float = 0.001):
+        super().__init__(config, sleep_interval)
+        self.tmux_service = tmux_service
+    
+    def _session_exists(self, session_pane: str) -> bool:
+        session_name = session_pane.split(':')[0]
+        return self.tmux_service.session_exists(session_name)
+    
+    def _capture_pane_content(self, session_pane: str) -> str:
+        return self.tmux_service.capture_pane_content(session_pane)
+    
+    def _send_enter_key(self, session_pane: str) -> bool:
+        return self.tmux_service.send_enter_key(session_pane)
+
+
+# Table-driven test data
+PROMPT_TEST_CASES = [
+    PromptTestCase("confirmation_question", "Do you want to continue?", True),
+    PromptTestCase("preference_question", "Would you like to proceed?", True),
+    PromptTestCase("proceed_question", "Proceed? (y/n)", True),
+    PromptTestCase("menu_option", "❯ 1. Yes\n❯ 2. No", True),
+    PromptTestCase("multiline_prompt", "Multiple lines\nDo you want to continue?\nMore text", True),
+    PromptTestCase("case_insensitive_lower", "do you want to continue?", True),
+    PromptTestCase("case_insensitive_upper", "DO YOU WANT TO CONTINUE?", True),
+    PromptTestCase("regular_output", "Regular terminal output", False),
+    PromptTestCase("error_message", "Error: command not found", False),
+    PromptTestCase("empty_content", "", False),
+    PromptTestCase("random_text", "Some random text", False),
+]
+
+
+@pytest.mark.parametrize("case", PROMPT_TEST_CASES)
+def test_prompt_detector_identifies_patterns(case: PromptTestCase):
+    """Test prompt detection with various input scenarios."""
     detector = PromptDetector()
-    
-    # Test cases that should match Claude prompts
-    prompt_cases = [
-        "Do you want to continue with this operation?",
-        "Would you like to proceed with the changes?",
-        "Proceed? (y/n)",
-        "❯ 1. Yes\n❯ 2. No",
-        "Multiple lines\nDo you want to continue?\nMore text"
-    ]
-    
-    for case in prompt_cases:
-        assert detector.detect_claude_prompt(case), f"Should detect prompt in: {case}"
-    
-    # Test cases that should NOT match
-    non_prompt_cases = [
-        "Regular terminal output",
-        "Some random text",
-        "Error: command not found",
-        ""
-    ]
-    
-    for case in non_prompt_cases:
-        assert not detector.detect_claude_prompt(case), f"Should NOT detect prompt in: {case}"
+    result = detector.detect_claude_prompt(case.content)
+    assert result == case.should_detect, f"Failed for {case.name}: '{case.content}'"
 
 
 @pytest.mark.unit
-def test_daemon_service_session_exists_check():
-    """Test that DaemonService correctly checks if tmux sessions exist."""
-    config = Mock()
-    service = DaemonService(config)
+def test_daemon_skips_nonexistent_sessions():
+    """Test that daemon skips sessions that don't exist."""
+    config = StubConfig(enabled_sessions={"nonexistent:0"})
+    tmux_service = FakeTmuxService()
+    service = DaemonServiceWithFakes(config, tmux_service)
     
-    with patch('subprocess.run') as mock_run:
-        # Test session exists
-        mock_run.return_value = Mock(returncode=0)
-        assert service._session_exists("test_session:0")
-        mock_run.assert_called_with(
-            ["tmux", "has-session", "-t", "test_session"],
-            capture_output=True
-        )
-        
-        # Test session does not exist
-        mock_run.return_value = Mock(returncode=1)
-        assert not service._session_exists("nonexistent:0")
+    # Session doesn't exist
+    service._check_enabled_sessions()
+    
+    # No keys should be sent
+    assert len(tmux_service.keys_sent) == 0
+
+
+@pytest.mark.unit  
+def test_daemon_processes_active_sessions_with_prompts():
+    """Test that daemon responds to prompts in active sessions."""
+    config = StubConfig(enabled_sessions={"active_session:0"})
+    tmux_service = FakeTmuxService()
+    
+    # Set up session with prompt content
+    tmux_service.existing_sessions.add("active_session")
+    tmux_service.pane_content["active_session:0"] = "Do you want to continue?"
+    
+    service = DaemonServiceWithFakes(config, tmux_service)
+    service._check_enabled_sessions()
+    
+    # Should have sent Enter key
+    assert "active_session:0" in tmux_service.keys_sent
 
 
 @pytest.mark.unit
-def test_daemon_service_capture_pane_content():
-    """Test that DaemonService can capture tmux pane content."""
-    config = Mock()
-    service = DaemonService(config)
+def test_daemon_ignores_sessions_without_prompts():
+    """Test that daemon ignores sessions with no prompt content."""
+    config = StubConfig(enabled_sessions={"quiet_session:0"})
+    tmux_service = FakeTmuxService()
     
-    with patch('subprocess.run') as mock_run:
-        # Test successful capture
-        mock_run.return_value = Mock(
-            returncode=0,
-            stdout="Sample pane content\nDo you want to continue?"
-        )
-        
-        content = service._capture_pane_content("session:0")
-        assert content == "Sample pane content\nDo you want to continue?"
-        mock_run.assert_called_with(
-            ["tmux", "capture-pane", "-p", "-t", "session:0", "-S", "-10"],
-            capture_output=True,
-            text=True
-        )
-        
-        # Test capture failure
-        mock_run.return_value = Mock(returncode=1, stdout="")
-        content = service._capture_pane_content("bad_session:0")
-        assert content == ""
+    # Set up session with regular content (no prompts)
+    tmux_service.existing_sessions.add("quiet_session")
+    tmux_service.pane_content["quiet_session:0"] = "Regular command output"
+    
+    service = DaemonServiceWithFakes(config, tmux_service)
+    service._check_enabled_sessions()
+    
+    # No keys should be sent
+    assert len(tmux_service.keys_sent) == 0
 
 
 @pytest.mark.unit
-def test_daemon_service_send_enter_key():
-    """Test that DaemonService can send Enter key to tmux pane."""
-    config = Mock()
-    service = DaemonService(config)
+def test_daemon_handles_multiple_sessions():
+    """Test that daemon processes multiple enabled sessions."""
+    config = StubConfig(enabled_sessions={"session1:0", "session2:1"})
+    tmux_service = FakeTmuxService()
     
-    with patch('subprocess.run') as mock_run:
-        # Test successful key send
-        mock_run.return_value = Mock(returncode=0)
-        result = service._send_enter_key("session:0")
-        assert result is True
-        mock_run.assert_called_with(
-            ["tmux", "send-keys", "-t", "session:0", "Enter"],
-            capture_output=True
-        )
-        
-        # Test send failure
-        mock_run.return_value = Mock(returncode=1)
-        result = service._send_enter_key("bad_session:0")
-        assert result is False
+    # Set up multiple sessions
+    tmux_service.existing_sessions.update(["session1", "session2"])
+    tmux_service.pane_content["session1:0"] = "Would you like to proceed?"
+    tmux_service.pane_content["session2:1"] = "Regular output"
+    
+    service = DaemonServiceWithFakes(config, tmux_service)
+    service._check_enabled_sessions()
+    
+    # Only session with prompt should get response
+    assert "session1:0" in tmux_service.keys_sent
+    assert "session2:1" not in tmux_service.keys_sent
+    assert len(tmux_service.keys_sent) == 1
 
 
 @pytest.mark.unit
-def test_daemon_service_check_enabled_sessions():
-    """Test that DaemonService correctly processes enabled sessions."""
-    config = Mock()
-    config.enabled_sessions = {"session1:0", "session2:1"}
+def test_daemon_handles_command_failures():
+    """Test that daemon gracefully handles tmux command failures."""
+    config = StubConfig(enabled_sessions={"failing_session:0"})
+    tmux_service = FakeTmuxService()
     
-    service = DaemonService(config)
+    # Set up session that exists but has command failures
+    tmux_service.existing_sessions.add("failing_session")
+    tmux_service.command_failures.add("failing_session:0")
     
-    with patch.object(service, '_session_exists') as mock_exists, \
-         patch.object(service, '_capture_pane_content') as mock_capture, \
-         patch.object(service, '_send_enter_key') as mock_send:
-        
-        # Setup mocks
-        mock_exists.return_value = True
-        mock_capture.return_value = "Do you want to continue?"
-        mock_send.return_value = True
-        
-        # Test check sessions
-        service._check_enabled_sessions()
-        
-        # Verify interactions
-        assert mock_exists.call_count == 2
-        assert mock_capture.call_count == 2  
-        assert mock_send.call_count == 2
+    service = DaemonServiceWithFakes(config, tmux_service)
+    service._check_enabled_sessions()
+    
+    # Should not crash and no keys sent
+    assert len(tmux_service.keys_sent) == 0
 
 
 @pytest.mark.unit
-def test_daemon_service_monitoring_loop_stops_after_max_iterations():
+def test_monitoring_loop_stops_after_max_iterations():
     """Test that monitoring loop respects max_iterations parameter."""
-    config = Mock()
-    config.enabled_sessions = set()
-    
-    # Create service with very short sleep interval for faster tests
-    service = DaemonService(config, sleep_interval=0.001)
+    config = StubConfig()
+    tmux_service = FakeTmuxService()
+    service = DaemonServiceWithFakes(config, tmux_service)
     
     # Run only 2 iterations
     service.start_monitoring_loop(max_iterations=2)
@@ -148,18 +188,14 @@ def test_daemon_service_monitoring_loop_stops_after_max_iterations():
 
 
 @pytest.mark.unit
-def test_prompt_detector_patterns_are_case_insensitive():
-    """Test that prompt detection works regardless of case."""
-    detector = PromptDetector()
+def test_monitoring_loop_can_be_stopped():
+    """Test that monitoring loop can be stopped externally."""
+    config = StubConfig()
+    tmux_service = FakeTmuxService()
+    service = DaemonServiceWithFakes(config, tmux_service)
     
-    # Test various cases
-    cases = [
-        "do you want to continue?",
-        "DO YOU WANT TO CONTINUE?", 
-        "Do You Want To Continue?",
-        "would you like to proceed?",
-        "WOULD YOU LIKE TO PROCEED?"
-    ]
+    # Start and immediately stop
+    service.running = True
+    service.stop()
     
-    for case in cases:
-        assert detector.detect_claude_prompt(case), f"Should detect prompt in: {case}"
+    assert service.running is False

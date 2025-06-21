@@ -4,16 +4,17 @@ import os
 import subprocess
 import time
 import threading
-import logging
 from .daemon_service import DaemonService
+from .logging_config import get_daemon_logger
+from .constants import DAEMON_PROCESS_NAMES, DEFAULT_LOG_FILE, PID_FILE_NAME
 
 
 class DaemonManager:
     """Manages the auto-yes daemon process."""
 
     def __init__(self):
-        self.pid_file = os.path.expanduser("~/.claude-autoyes-daemon.pid")
-        self.log_file = "/tmp/claude-autoyes.log"
+        self.pid_file = os.path.expanduser(PID_FILE_NAME)
+        self.log_file = DEFAULT_LOG_FILE
 
     def is_running(self) -> bool:
         """Check if daemon is currently running."""
@@ -29,9 +30,9 @@ class DaemonManager:
                 ["ps", "-p", str(pid)], capture_output=True, text=True
             )
             if result.returncode == 0:
-                # Double-check it's our daemon by looking for Python process
+                # Double-check it's our daemon by looking for specific process signature
                 ps_output = result.stdout
-                if "python" in ps_output.lower():
+                if any(name in ps_output for name in DAEMON_PROCESS_NAMES):
                     return True
 
             # PID exists but process is not our daemon, clean up
@@ -51,13 +52,8 @@ class DaemonManager:
             return True
 
         try:
-            # Configure logging to file (equivalent to bash LOG_FILE)
-            logging.basicConfig(
-                filename=self.log_file,
-                level=logging.INFO,
-                format="[%(asctime)s] %(message)s",
-                datefmt="%Y-%m-%d %H:%M:%S",
-            )
+            # Set up centralized logging for daemon
+            logger = get_daemon_logger(self.log_file)
 
             # Start Python daemon service in background thread
             daemon_service = DaemonService(config)
@@ -74,28 +70,31 @@ class DaemonManager:
             return self.is_running()
 
         except Exception as e:
-            logging.error(f"Failed to start daemon: {e}")
+            logger = get_daemon_logger(self.log_file)
+            logger.error(f"Failed to start daemon: {e}")
             return False
 
     def _run_daemon_with_pid_management(self, daemon_service):
         """Run daemon service with PID file management."""
+        logger = get_daemon_logger(self.log_file)
+
         try:
             # Write PID file (equivalent to bash echo $$ > "$PID_FILE")
             with open(self.pid_file, "w") as f:
                 f.write(str(os.getpid()))
 
-            logging.info(f"Claude auto-yes daemon started with PID {os.getpid()}")
+            logger.info(f"Claude auto-yes daemon started with PID {os.getpid()}")
 
             # Start monitoring loop
             daemon_service.start_monitoring_loop()
 
         except Exception as e:
-            logging.error(f"Daemon error: {e}")
+            logger.error(f"Daemon error: {e}")
         finally:
             # Cleanup PID file on exit (equivalent to bash cleanup function)
             if os.path.exists(self.pid_file):
                 os.unlink(self.pid_file)
-            logging.info("Daemon shutting down")
+            logger.info("Daemon shutting down")
 
     def stop(self) -> bool:
         """Stop the auto-yes daemon."""

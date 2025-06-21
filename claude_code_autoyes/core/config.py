@@ -3,16 +3,17 @@
 import json
 import os
 from typing import Dict, List, Optional, Set
+from .constants import CONFIG_FILE_NAME, DEFAULT_REFRESH_INTERVAL
 
 
 class ConfigManager:
     """Manages configuration for claude-autoyes."""
 
     def __init__(self, config_file: Optional[str] = None):
-        self.config_file = config_file or os.path.expanduser("~/.claude-autoyes-config")
+        self.config_file = config_file or os.path.expanduser(CONFIG_FILE_NAME)
         self.enabled_sessions: Set[str] = set()
         self.daemon_enabled = False
-        self.refresh_interval = 30
+        self.refresh_interval = DEFAULT_REFRESH_INTERVAL
         self.load()
 
     def load(self) -> Dict:
@@ -23,7 +24,9 @@ class ConfigManager:
                     data = json.load(f)
                     self.enabled_sessions = set(data.get("enabled_sessions", []))
                     self.daemon_enabled = data.get("daemon_enabled", False)
-                    self.refresh_interval = data.get("refresh_interval", 30)
+                    self.refresh_interval = data.get(
+                        "refresh_interval", DEFAULT_REFRESH_INTERVAL
+                    )
                     return data
         except (json.JSONDecodeError, FileNotFoundError):
             pass
