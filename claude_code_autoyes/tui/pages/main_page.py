@@ -63,7 +63,7 @@ class MainPage(Container):
         """Initialize the page when mounted."""
         # Set focus to the table for keyboard navigation
         instance_table = self.query_one(InstanceTable)
-        self.set_focus(instance_table.table)
+        instance_table.table.focus()
 
     def rebuild(self) -> None:
         """Rebuild all child components."""
