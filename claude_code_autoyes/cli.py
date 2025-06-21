@@ -2,7 +2,7 @@
 
 import click
 
-from .commands import status, enable_all, disable_all, tui
+from .commands import status, enable_all, disable_all, tui, daemon
 
 
 @click.group(invoke_without_command=True)
@@ -19,6 +19,7 @@ cli.add_command(status)
 cli.add_command(enable_all)
 cli.add_command(disable_all)
 cli.add_command(tui)
+cli.add_command(daemon)
 
 
 if __name__ == "__main__":

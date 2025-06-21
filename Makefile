@@ -189,18 +189,17 @@ push-image: build-image
 
 # Development & Testing Commands
 ###############################
-TOOL_NAME = claude-code-autoyes-test
-
 dev-install: setup  ## Install current branch as test tool
-	@echo "Installing current branch as $(TOOL_NAME)..."
-	uv tool install --from . --force-reinstall --name $(TOOL_NAME) claude-code-autoyes
-	@echo "✅ Installed as $(TOOL_NAME)"
-	@echo "💡 Usage: $(TOOL_NAME) --help"
+	@echo "Installing current branch as test tool..."
+	uv tool install --from . --reinstall claude-code-autoyes
+	@echo "✅ Installed as claude-code-autoyes"
+	@echo "💡 Usage: claude-code-autoyes --help"
+	@echo "⚠️  Note: This replaces any existing claude-code-autoyes installation"
 
 dev-uninstall:  ## Remove test tool installation
-	@echo "Uninstalling $(TOOL_NAME)..."
-	uv tool uninstall $(TOOL_NAME) || echo "Tool not installed"
-	@echo "✅ Uninstalled $(TOOL_NAME)"
+	@echo "Uninstalling claude-code-autoyes..."
+	uv tool uninstall claude-code-autoyes || echo "Tool not installed"
+	@echo "✅ Uninstalled claude-code-autoyes"
 
 dev-test-pr:  ## Test a specific PR (usage: make dev-test-pr PR=4)
 	@if [ -z "$(PR)" ]; then \
@@ -213,7 +212,7 @@ dev-test-pr:  ## Test a specific PR (usage: make dev-test-pr PR=4)
 	@echo "📦 Installing PR $(PR) as test tool..."
 	$(MAKE) dev-install
 	@echo "✅ PR $(PR) ready for testing"
-	@echo "💡 Run: $(TOOL_NAME) --help"
+	@echo "💡 Run: claude-code-autoyes --help"
 	@echo "🧹 Clean up with: make dev-uninstall && git checkout main"
 
 dev-run:  ## Run current code without installing
@@ -235,7 +234,7 @@ dev-status:  ## Show current development status
 	@uv tool list | grep claude-code-autoyes || echo "  No test tools installed"
 	@echo ""
 	@echo "📊 Daemon status:"
-	@$(TOOL_NAME) status 2>/dev/null || uv run claude-code-autoyes.py status
+	@claude-code-autoyes status 2>/dev/null || uv run claude-code-autoyes.py status
 
 dev-tmux-setup:  ## Set up test tmux session for daemon testing
 	@echo "🖥️  Setting up test tmux session..."
@@ -253,10 +252,10 @@ dev-tmux-setup:  ## Set up test tmux session for daemon testing
 dev-daemon-test: dev-tmux-setup  ## Test daemon with simulated prompts
 	@echo "🤖 Testing daemon with simulated prompts..."
 	@echo "🚀 Starting daemon (if not running)..."
-	@$(TOOL_NAME) enable-all || true
-	@$(TOOL_NAME) daemon start || true
+	@claude-code-autoyes enable-all || true
+	@claude-code-autoyes daemon start || true
 	@echo "📋 Daemon status:"
-	@$(TOOL_NAME) daemon status
+	@claude-code-autoyes daemon status
 	@echo ""
 	@echo "🔍 To test manually:"
 	@echo "  1. tmux attach -t claude-test"
@@ -269,11 +268,11 @@ dev-logs:  ## Tail daemon logs
 		tail -f /tmp/claude-autoyes.log; \
 	else \
 		echo "❌ No log file found at /tmp/claude-autoyes.log"; \
-		echo "💡 Start daemon with: $(TOOL_NAME) daemon start"; \
+		echo "💡 Start daemon with: claude-code-autoyes daemon start"; \
 	fi
 
 dev-daemon-stop:  ## Stop daemon and clean up test session
 	@echo "🛑 Stopping daemon and cleaning up..."
-	@$(TOOL_NAME) daemon stop 2>/dev/null || echo "Daemon not running"
+	@claude-code-autoyes daemon stop 2>/dev/null || echo "Daemon not running"
 	@tmux kill-session -t claude-test 2>/dev/null || echo "Test session not found"
 	@echo "✅ Cleanup complete"
