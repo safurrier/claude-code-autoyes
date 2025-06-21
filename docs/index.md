@@ -1,71 +1,77 @@
-# claude-code-autoyes
+# Claude Code Auto-Yes
 
-Simple to toggle autoyes across Claude Code sessions
+Automatically respond "yes" to prompts in Claude Code sessions running in tmux.
+
+## What is Claude Code Auto-Yes?
+
+Claude Code Auto-Yes is a tool that monitors your tmux sessions for Claude Code instances and automatically responds "yes" to confirmation prompts. This eliminates the need to manually confirm actions during development workflows.
 
 ## Features
 
-- 🔧 Modern Python tooling with UV package manager
-- 🧪 Comprehensive testing with pytest
-- 🎨 Code formatting with Ruff
-- 🔍 Type checking with MyPy
-- 📚 Documentation with MkDocs + Material
-- 🚀 CI/CD with GitHub Actions
-- 🐳 Docker support for development
+- 🤖 **Automatic prompt detection** - Finds Claude prompts using smart pattern matching
+- 🎯 **Tmux integration** - Works seamlessly with tmux sessions  
+- 🔧 **Session management** - Enable/disable auto-yes per session
+- 🖥️ **Interactive TUI** - Manage sessions with a beautiful terminal interface
+- ⚡ **CLI commands** - Quick status checks and daemon control
+- 🛡️ **Safe operation** - Process-based detection to avoid false positives
 
 ## Quick Start
 
+### Installation
+
 ```bash
-# Clone the repository
+# Install via UV tool
+uv tool install claude-code-autoyes
+
+# Or install from source
 git clone https://github.com/safurrier/claude-code-autoyes.git
 cd claude-code-autoyes
-
-# Set up the development environment
-make setup
-
-# Run quality checks
-make check
+make dev-install
 ```
 
-## Installation
-
-### For Users
+### Basic Usage
 
 ```bash
+# Check current status
+claude-code-autoyes status
+
+# Launch interactive TUI
+claude-code-autoyes tui
+
+# Enable auto-yes for all Claude sessions
+claude-code-autoyes enable-all
+
+# Start the background daemon
+claude-code-autoyes daemon start
+```
+
+## How It Works
+
+1. **Detection**: Scans tmux panes for Claude Code processes
+2. **Monitoring**: Background daemon watches enabled sessions for prompts
+3. **Response**: Automatically sends "Enter" key when Claude prompts are detected
+4. **Control**: Fine-grained control over which sessions have auto-yes enabled
+
+## Installation Options
+
+### End Users
+
+```bash
+# Install as a UV tool (recommended)
+uv tool install claude-code-autoyes
+
+# Or use pip
 pip install claude-code-autoyes
 ```
 
-### For Development
+### Developers
 
 ```bash
-# Clone the repository
+# Clone and set up development environment
 git clone https://github.com/safurrier/claude-code-autoyes.git
 cd claude-code-autoyes
-
-# Set up development environment
 make setup
-
-# Install pre-commit hooks (optional)
-make install-hooks
-```
-
-## Project Structure
-
-```
-claude-code-autoyes/
-├── claude_code_autoyes/      # Main package
-├── tests/                      # Test files
-├── docs/                       # Documentation
-├── scripts/                    # Utility scripts
-├── docker/                     # Docker configuration
-└── .github/workflows/          # CI/CD automation
-```
-
-## Usage
-
-```python
-import claude_code_autoyes
-
-# Your usage examples here
+make dev-install
 ```
 
 ## Development
