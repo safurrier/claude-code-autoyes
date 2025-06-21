@@ -46,11 +46,12 @@ class ClaudeAutoYesNewApp(App[None]):
         daemon: DaemonManager | None = None,
         **kwargs: Any,
     ):
+        # Set themes before super().__init__() since get_css_variables() is called during init
+        self.themes = THEMES
         super().__init__(**kwargs)
         self.detector = detector or ClaudeDetector()
         self.config = config or ConfigManager()
         self.daemon = daemon or DaemonManager()
-        self.themes = THEMES
 
     def get_css_variables(self) -> dict[str, str]:
         """Apply theme CSS variables - Bagels pattern."""
@@ -98,7 +99,7 @@ class ClaudeAutoYesNewApp(App[None]):
         main_page = self.query_one(MainPage)
         main_page.rebuild()
 
-    def on_button_pressed(self, event: Button.Pressed) -> None:
+    async def on_button_pressed(self, event: Button.Pressed) -> None:
         """Handle button clicks."""
         button_id = event.button.id
 
@@ -130,7 +131,7 @@ class ClaudeAutoYesNewApp(App[None]):
                 self.notify("Failed to stop daemon", severity="error")
 
         elif button_id == "quit":
-            self.action_quit()
+            await self.action_quit()
 
     # Keyboard shortcuts - number keys for quick toggle
     def key_1(self) -> None:
@@ -169,9 +170,9 @@ class ClaudeAutoYesNewApp(App[None]):
         """Toggle ninth Claude instance."""
         self._toggle_instance_by_index(8)
 
-    def key_q(self) -> None:
+    async def key_q(self) -> None:
         """Quit the application."""
-        self.action_quit()
+        await self.action_quit()
 
     def key_r(self) -> None:
         """Refresh instances."""
