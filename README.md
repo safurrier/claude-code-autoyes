@@ -85,6 +85,8 @@ The interactive TUI provides:
 - **Daemon Control**: Start/stop background daemon with 'd' key
 - **Bulk Operations**: Enable/disable all instances at once
 - **Real-time Updates**: Live status updates every few seconds
+- **Multiple Themes**: 11 beautiful themes including Dracula, Nord, Gruvbox, and more
+- **Jump Navigation**: Quick keyboard navigation to any UI element with 'v' key
 
 ### Keyboard Shortcuts
 - `↑↓`: Navigate instances
@@ -92,7 +94,9 @@ The interactive TUI provides:
 - `1-9`: Quick toggle by number
 - `d`: Toggle daemon
 - `r`: Refresh
-- `q`: Quit
+- `t`: Cycle themes (11 available themes)
+- `v`: Jump Mode (quick navigation)
+- `Ctrl+Q`: Quit
 
 ## How It Works
 
@@ -120,9 +124,18 @@ claude-code-autoyes/
 │   │   ├── detector.py      # Claude detection
 │   │   ├── config.py        # Configuration management
 │   │   └── daemon.py        # Background daemon
+│   ├── tui/                 # Modular TUI architecture
+│   │   ├── app.py          # Main TUI application
+│   │   ├── components/     # Reusable TUI components
+│   │   │   ├── instance_table.py    # Instance table widget
+│   │   │   ├── jump_overlay.py      # Jump navigation overlay
+│   │   │   ├── jumper.py           # Jump navigation logic
+│   │   │   └── status_bar.py       # Status display
+│   │   ├── pages/          # TUI pages/screens
+│   │   │   └── main_page.py        # Main application page
+│   │   └── themes.py       # Theme system (11 themes)
 │   ├── commands/            # CLI commands
 │   ├── cli.py              # Main CLI entry point
-│   ├── tui.py              # TUI application
 │   └── __main__.py         # Module execution
 ├── tests/                   # Test suite
 │   ├── e2e/                # End-to-end tests
