@@ -1,10 +1,9 @@
 """Jump navigation overlay modal."""
 
 from textual import events
-from textual.widget import Widget
 from textual.app import ComposeResult
-from textual.containers import Center, Middle
 from textual.screen import ModalScreen
+from textual.widget import Widget
 from textual.widgets import Label, Static
 
 from .jumper import Jumper
@@ -17,7 +16,7 @@ class JumpOverlay(ModalScreen[str | Widget | None]):
     JumpOverlay {
         background: $background 50%;
     }
-    
+
     .textual-jump-label {
         layer: textual-jump;
         text-style: bold;
@@ -28,7 +27,7 @@ class JumpOverlay(ModalScreen[str | Widget | None]):
         width: auto;
         height: auto;
     }
-    
+
     #textual-jump-info {
         dock: bottom;
         height: 1;
@@ -38,7 +37,7 @@ class JumpOverlay(ModalScreen[str | Widget | None]):
         text-align: center;
         text-style: bold;
     }
-    
+
     #textual-jump-message {
         dock: top;
         height: 1;
@@ -52,7 +51,7 @@ class JumpOverlay(ModalScreen[str | Widget | None]):
 
     def __init__(self, jumper: Jumper) -> None:
         """Initialize jump overlay with jumper instance.
-        
+
         Args:
             jumper: The jumper instance to use for navigation
         """
@@ -63,11 +62,11 @@ class JumpOverlay(ModalScreen[str | Widget | None]):
         """Compose the jump overlay interface."""
         # Get current jump targets
         overlays = self.jumper.get_overlays()
-        
+
         # Create instruction messages
         yield Static("Press a key to jump to target", id="textual-jump-message")
         yield Static("ESC to dismiss", id="textual-jump-info")
-        
+
         # Create jump labels at widget positions
         for offset, jump_info in overlays.items():
             key, _widget = jump_info
@@ -77,14 +76,14 @@ class JumpOverlay(ModalScreen[str | Widget | None]):
 
     def on_key(self, event: events.Key) -> None:
         """Handle key press for jump navigation.
-        
+
         Args:
             event: The key event
         """
         # Prevent event propagation to avoid focus conflicts
         event.prevent_default()
         event.stop()
-        
+
         if event.key == "escape":
             # Dismiss overlay without selection
             self.dismiss(None)

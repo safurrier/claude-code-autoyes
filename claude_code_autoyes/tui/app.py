@@ -39,7 +39,7 @@ class ClaudeAutoYesApp(App[None]):
 
     # Theme reactive - follows Bagels pattern
     app_theme: reactive[str] = reactive("dracula", init=False)
-    
+
     # Jump mode reactive - follows Bagels pattern
     _jumping: reactive[bool] = reactive(False, init=False, bindings=True)
 
@@ -56,7 +56,7 @@ class ClaudeAutoYesApp(App[None]):
         self.detector = detector or ClaudeDetector()
         self.config = config or ConfigManager()
         self.daemon = daemon or DaemonManager()
-        
+
         # Initialize jumper for navigation - will be set up in on_mount
         self.jumper: Jumper | None = None
 
@@ -95,12 +95,12 @@ class ClaudeAutoYesApp(App[None]):
         # Set up auto-refresh intervals with performance optimization
         self.set_interval(self.config.refresh_interval, self.refresh_instances)
         self.set_interval(5, self.update_daemon_status)
-        
+
         # Initialize jumper with component mappings
         self.jumper = Jumper(
             {
                 "instance-table-container": "t",
-                "button-controls": "b", 
+                "button-controls": "b",
                 "status-bar": "s",
                 "enable-all": "e",
                 "disable-all": "d",
@@ -265,28 +265,31 @@ class ClaudeAutoYesApp(App[None]):
         """Handle jump mode state changes."""
         if jumping and self.jumper:
             # Show jump overlay
-            self.push_screen(JumpOverlay(self.jumper), callback=self._handle_jump_target)
+            self.push_screen(
+                JumpOverlay(self.jumper), callback=self._handle_jump_target
+            )
 
     def _handle_jump_target(self, target: Any | None) -> None:
         """Handle jump target selection."""
         if target is None:
             # Dismissed without selection
             return
-            
+
         # Only process Widget targets
         from textual.widget import Widget
+
         if not isinstance(target, Widget):
             return
-            
+
         try:
             # Focus the target widget
-            if hasattr(target, 'focus'):
+            if hasattr(target, "focus"):
                 target.focus()
-            elif hasattr(target, 'can_focus') and target.can_focus:
+            elif hasattr(target, "can_focus") and target.can_focus:
                 self.set_focus(target)
             else:
                 # If not focusable, try to click it
-                if hasattr(target, 'post_message') and hasattr(target, 'Clicked'):
+                if hasattr(target, "post_message") and hasattr(target, "Clicked"):
                     target.post_message(target.Clicked())
         except Exception:
             # Fallback: just try to focus
