@@ -15,7 +15,7 @@ repos:
         pass_filenames: false
     -   id: test
         name: Run Tests
-        entry: make test
+        entry: make test-fast
         language: system
         always_run: true
         pass_filenames: false

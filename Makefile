@@ -82,6 +82,10 @@ test-smoke: setup  # Run smoke tests only (fast)
 	uv run -m pytest tests/smoke/ -v -x
 	@rm -f .coverage.*  # Clean up coverage temp files
 
+test-fast: setup  # Run smoke and unit tests for pre-commit (fast)
+	uv run -m pytest tests/smoke/ tests/unit/ -v -x
+	@rm -f .coverage.*  # Clean up coverage temp files
+
 test-e2e: setup  # Run end-to-end tests
 	uv run -m pytest tests/e2e/ -v
 	@rm -f .coverage.*  # Clean up coverage temp files

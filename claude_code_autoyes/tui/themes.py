@@ -27,26 +27,45 @@ class Theme:
 
     def to_color_system(self) -> ColorSystem:
         """Convert this theme to a ColorSystem."""
-        theme_dict = {
-            "primary": self.primary,
-            "secondary": self.secondary,
-            "warning": self.warning,
-            "error": self.error,
-            "success": self.success,
-            "accent": self.accent,
-            "foreground": self.foreground,
-            "background": self.background,
-            "surface": self.surface,
-            "panel": self.panel,
-            "boost": self.boost,
-            "dark": self.dark,
-            "luminosity_spread": self.luminosity_spread,
-            "text_alpha": self.text_alpha,
-            "variables": self.variables,
-        }
-        # Remove None values
-        theme_dict = {k: v for k, v in theme_dict.items() if v is not None}
-        return ColorSystem(**theme_dict)
+        from typing import Any
+
+        # Build kwargs for ColorSystem with proper types
+        kwargs: dict[str, Any] = {}
+
+        # Add string fields if not None
+        if self.primary is not None:
+            kwargs["primary"] = self.primary
+        if self.secondary is not None:
+            kwargs["secondary"] = self.secondary
+        if self.warning is not None:
+            kwargs["warning"] = self.warning
+        if self.error is not None:
+            kwargs["error"] = self.error
+        if self.success is not None:
+            kwargs["success"] = self.success
+        if self.accent is not None:
+            kwargs["accent"] = self.accent
+        if self.foreground is not None:
+            kwargs["foreground"] = self.foreground
+        if self.background is not None:
+            kwargs["background"] = self.background
+        if self.surface is not None:
+            kwargs["surface"] = self.surface
+        if self.panel is not None:
+            kwargs["panel"] = self.panel
+        if self.boost is not None:
+            kwargs["boost"] = self.boost
+
+        # Add other typed fields
+        kwargs["dark"] = self.dark
+        kwargs["luminosity_spread"] = self.luminosity_spread
+        kwargs["text_alpha"] = self.text_alpha
+
+        # Add variables if present
+        if self.variables:
+            kwargs["variables"] = self.variables
+
+        return ColorSystem(**kwargs)
 
 
 # Available themes
