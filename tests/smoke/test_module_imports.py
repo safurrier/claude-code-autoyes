@@ -7,6 +7,7 @@ from claude_code_autoyes.core.models import ClaudeInstance
 from claude_code_autoyes.core.detector import ClaudeDetector
 from claude_code_autoyes.core.config import ConfigManager
 from claude_code_autoyes.core.daemon import DaemonManager
+# Import from tui package since we now have a modular structure 
 from claude_code_autoyes.tui import ClaudeAutoYesApp
 from claude_code_autoyes.cli import cli
 

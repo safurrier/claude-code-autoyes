@@ -2,11 +2,11 @@
 
 import click
 
-from ..tui import ClaudeAutoYesApp
+# Import the modular TUI (now the only implementation)
+from ..tui.app import run_tui
 
 
 @click.command()
 def tui() -> None:
     """Launch interactive TUI."""
-    app = ClaudeAutoYesApp()
-    app.run()
+    run_tui()

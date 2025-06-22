@@ -102,6 +102,19 @@ Features:
 - See which sessions have Claude Code running
 - Toggle auto-yes on/off per session
 - Real-time status updates
+- **Multiple themes**: 11 beautiful themes including Dracula, Nord, Gruvbox, and more
+- **Jump navigation**: Quick keyboard navigation to any UI element
+- **Enhanced controls**: Improved focus management and responsiveness
+
+### TUI Keyboard Shortcuts
+- `↑↓`: Navigate instances
+- `Enter/Space`: Toggle selected instance
+- `1-9`: Quick toggle by number
+- `d`: Toggle daemon
+- `r`: Refresh
+- `t`: Cycle themes
+- `v`: Jump Mode (quick navigation)
+- `Ctrl+Q`: Quit
 
 ## How It Works
 
