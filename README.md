@@ -1,156 +1,156 @@
 # Claude Code AutoYes
 
-Interactive TUI for managing auto-yes across Claude instances in tmux. Never miss a Claude prompt again!
+Stop clicking "yes" on every Claude Code prompt. This tool monitors your tmux sessions and automatically responds to confirmation prompts, so you can focus on coding instead of clicking.
 
-## Features
+## Why You Need This
 
-- 🖥️ **Interactive TUI**: Beautiful terminal interface for managing Claude instances
-- 🔍 **Auto-Detection**: Automatically finds Claude instances running in tmux panes
-- ⚡ **Daemon Mode**: Background process to automatically respond to prompts
-- 🎯 **Selective Control**: Enable/disable auto-yes per Claude instance
-- 📊 **Real-time Status**: Live monitoring of Claude instances and their states
-- 🛠️ **Multiple Installation Options**: UV tool, UV script, or traditional pip
+When using Claude Code, you constantly get prompted with "Do you want to continue?" and similar questions. If you're in a flow state, these interruptions kill your momentum. You start a script, walk away for coffee, and come back to find it stopped waiting for a response you never saw.
 
-## Installation
+This tool solves that by watching your Claude sessions and automatically responding "yes" when appropriate. You stay in control - enable it for sessions where you want automation, leave it off when you need to review each step.
 
-### UV Tool (Recommended)
-Install as a global tool with uv:
+## Quick Start
+
+Let's get you up and running in under 2 minutes.
+
+### Step 1: Install
 ```bash
-# Install from GitHub
 uv tool install git+https://github.com/safurrier/claude-code-autoyes.git
-
-# Or install locally
-git clone https://github.com/safurrier/claude-code-autoyes.git
-cd claude-code-autoyes
-uv tool install .
 ```
 
-### UV Script (Alternative)
+### Step 2: See What's Running
 ```bash
-# Download and run directly with UV
-curl -s https://raw.githubusercontent.com/safurrier/claude-code-autoyes/main/claude_code_autoyes.py | uv run --script -
-
-# Or run locally
-git clone https://github.com/safurrier/claude-code-autoyes.git
-cd claude-code-autoyes
-uv run claude_code_autoyes.py
+claude-code-autoyes status
 ```
 
-### Development Installation
+You'll see a list of your tmux sessions and which ones have Claude Code running. Something like:
+```
+Session: main, Pane: 0 - Claude detected ❌ (disabled)
+Session: work, Pane: 1 - Claude detected ❌ (disabled)
+```
+
+### Step 3: Enable Auto-Yes
+```bash
+claude-code-autoyes enable-all
+```
+
+### Step 4: Start the Daemon
+```bash
+claude-code-autoyes daemon start
+```
+
+That's it! Now when Claude prompts you, the tool automatically responds. To see it in action, run the interactive TUI:
+
+```bash
+claude-code-autoyes
+```
+
+## The Interactive Interface
+
+The TUI gives you real-time control over everything. Press individual number keys (1-9) to quickly toggle specific Claude instances, or use the buttons for bulk operations.
+
+**Pro tips:**
+- Press `t` to cycle through 11 themes (try Dracula or Nord)
+- Press `v` for jump mode - quick keyboard navigation to any part of the interface
+- Press `d` to toggle the daemon on/off
+- Use `Ctrl+Q` to quit (not just `q` - we learned that lesson)
+
+## When Things Go Wrong
+
+**"No sessions detected"**: Make sure Claude Code is actually running in a tmux session. This tool can't see processes outside tmux.
+
+**"Daemon not responding"**: Check if it's actually running with `claude-code-autoyes daemon status`. If it's stuck, restart it:
+```bash
+claude-code-autoyes daemon stop
+claude-code-autoyes daemon start
+```
+
+**"It's not auto-responding"**: Verify the session is enabled with `claude-code-autoyes status`. The daemon only watches enabled sessions.
+
+## How It Actually Works
+
+The tool scans tmux sessions looking for processes with "claude" in the name. When it finds them, it can monitor those panes for specific prompt patterns like:
+- "Do you want to"
+- "Would you like to" 
+- "Proceed?"
+- "❯ 1. Yes"
+
+When a prompt appears in an enabled session, the daemon sends an "Enter" keypress to that tmux pane. It's that simple.
+
+## Advanced Usage
+
+### Selective Control
+You don't have to enable all sessions. Use the TUI to toggle individual Claude instances, or enable/disable specific ones:
+
+```bash
+# Check what's available first
+claude-code-autoyes status
+
+# Enable just session "main", pane 0
+claude-code-autoyes enable main:0
+
+# Disable a specific session
+claude-code-autoyes disable work:1
+```
+
+### Different Installation Methods
+
+**UV Tool** (recommended - installs globally):
+```bash
+uv tool install git+https://github.com/safurrier/claude-code-autoyes.git
+```
+
+**UV Script** (portable - no installation):
+```bash
+curl -s https://raw.githubusercontent.com/safurrier/claude-code-autoyes/main/claude_code_autoyes.py | uv run --script -
+```
+
+**Development Setup** (if you want to hack on it):
 ```bash
 git clone https://github.com/safurrier/claude-code-autoyes.git
 cd claude-code-autoyes
 make setup
 ```
 
-## Usage
+### Daemon Management
 
-### Installed as UV Tool
-```bash
-# Launch interactive TUI (default)
-claude-code-autoyes
+The daemon runs in the background monitoring your enabled sessions. You can:
+- `claude-code-autoyes daemon start` - Start monitoring
+- `claude-code-autoyes daemon stop` - Stop monitoring  
+- `claude-code-autoyes daemon status` - Check if it's running
+- `claude-code-autoyes daemon restart` - Restart if it gets stuck
 
-# Show current status
-claude-code-autoyes status
+Logs go to `/tmp/claude-autoyes.log` if you need to debug issues.
 
-# Enable auto-yes for all Claude instances
-claude-code-autoyes enable-all
+## Keyboard Reference
 
-# Disable auto-yes for all instances
-claude-code-autoyes disable-all
-
-# Launch TUI explicitly
-claude-code-autoyes tui
-```
-
-### Running as Script
-```bash
-# UV script (portable)
-uv run claude_code_autoyes.py
-
-# Module execution
-uv run -m claude_code_autoyes
-
-# With specific commands
-uv run claude_code_autoyes.py status
-uv run -m claude_code_autoyes enable-all
-```
-
-## TUI Interface
-
-The interactive TUI provides:
-
-- **Table View**: All detected Claude instances with their status
-- **Quick Toggle**: Press 1-9 to quickly toggle individual instances
-- **Daemon Control**: Start/stop background daemon with 'd' key
-- **Bulk Operations**: Enable/disable all instances at once
-- **Real-time Updates**: Live status updates every few seconds
-- **Multiple Themes**: 11 beautiful themes including Dracula, Nord, Gruvbox, and more
-- **Jump Navigation**: Quick keyboard navigation to any UI element with 'v' key
-
-### Keyboard Shortcuts
-- `↑↓`: Navigate instances
-- `Enter/Space`: Toggle selected instance
-- `1-9`: Quick toggle by number
-- `d`: Toggle daemon
-- `r`: Refresh
-- `t`: Cycle themes (11 available themes)
-- `v`: Jump Mode (quick navigation)
-- `Ctrl+Q`: Quit
-
-## How It Works
-
-1. **Detection**: Scans tmux panes for Claude processes
-2. **Monitoring**: Tracks which instances need auto-yes responses
-3. **Automation**: Background daemon watches for prompts and responds automatically
-4. **Control**: Fine-grained control over which instances are automated
-
-## Development
-
-### Quality Checks
-```bash
-make check      # Run all checks (test, mypy, lint, format)
-make test       # Run tests with coverage
-make test-smoke # Fast module import tests
-make test-e2e   # CLI equivalence tests
-```
-
-### Project Structure
-```
-claude-code-autoyes/
-├── claude_code_autoyes/      # Main package
-│   ├── core/                 # Business logic
-│   │   ├── models.py        # Data models
-│   │   ├── detector.py      # Claude detection
-│   │   ├── config.py        # Configuration management
-│   │   └── daemon.py        # Background daemon
-│   ├── tui/                 # Modular TUI architecture
-│   │   ├── app.py          # Main TUI application
-│   │   ├── components/     # Reusable TUI components
-│   │   │   ├── instance_table.py    # Instance table widget
-│   │   │   ├── jump_overlay.py      # Jump navigation overlay
-│   │   │   ├── jumper.py           # Jump navigation logic
-│   │   │   └── status_bar.py       # Status display
-│   │   ├── pages/          # TUI pages/screens
-│   │   │   └── main_page.py        # Main application page
-│   │   └── themes.py       # Theme system (11 themes)
-│   ├── commands/            # CLI commands
-│   ├── cli.py              # Main CLI entry point
-│   └── __main__.py         # Module execution
-├── tests/                   # Test suite
-│   ├── e2e/                # End-to-end tests
-│   ├── smoke/              # Smoke tests
-│   ├── integration/        # Integration tests
-│   └── unit/               # Unit tests
-└── claude_code_autoyes.py   # UV script wrapper
-```
+When using the TUI:
+- `↑↓` - Navigate the list
+- `Enter` or `Space` - Toggle the selected session
+- `1-9` - Instantly toggle sessions by number
+- `d` - Start/stop the daemon
+- `r` - Refresh the session list
+- `t` - Cycle through themes
+- `v` - Jump mode (press letter keys to jump to interface elements)
+- `Ctrl+Q` - Quit
 
 ## Requirements
 
-- Python 3.9+
-- tmux (for Claude instance detection)
-- Claude Code instances running in tmux
+- Python 3.9 or newer
+- tmux (this tool is useless without it)
+- Claude Code running in tmux sessions
+
+## Development
+
+Want to contribute or run the tests?
+
+```bash
+make check      # Run all quality checks
+make test       # Run the test suite
+make docs-serve # Preview documentation locally
+```
+
+The codebase uses modern Python with strict typing, comprehensive tests, and a modular TUI architecture. Check out `PROJECT_CONVENTIONS.md` for development guidelines.
 
 ## License
 
-MIT License - see LICENSE file for details.
+MIT License - use it, modify it, share it.
