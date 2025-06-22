@@ -24,6 +24,15 @@ class ButtonControls(Container):
         margin-bottom: 1;
     }
 
+    /* Container focus support - Bagels pattern */
+    ButtonControls:focus {
+        border: round $accent;
+    }
+
+    ButtonControls:focus-within {
+        border: round $accent;
+    }
+
     ButtonControls > Button {
         margin: 0 1;
         width: 1fr;
@@ -42,11 +51,12 @@ class ButtonControls(Container):
         text-style: bold;
     }
 
+    /* Improved focus styling - Bagels pattern */
     ButtonControls > Button:focus {
-        background: $accent;
-        border: thick $foreground;
-        color: $background;
-        text-style: bold;
+        text-style: bold reverse;
+        background: $accent 10%;
+        border: solid $accent;
+        color: $foreground;
     }
 
     ButtonControls > Button.-success {
@@ -62,6 +72,13 @@ class ButtonControls(Container):
         text-style: bold;
     }
 
+    ButtonControls > Button.-success:focus {
+        text-style: bold reverse;
+        background: $success 20%;
+        border: solid $success;
+        color: $foreground;
+    }
+
     ButtonControls > Button.-error {
         background: $error;
         color: $background;
@@ -75,6 +92,13 @@ class ButtonControls(Container):
         text-style: bold;
     }
 
+    ButtonControls > Button.-error:focus {
+        text-style: bold reverse;
+        background: $error 20%;
+        border: solid $error;
+        color: $foreground;
+    }
+
     ButtonControls > Button.-primary {
         background: $primary;
         color: $background;
@@ -86,6 +110,13 @@ class ButtonControls(Container):
         color: $background;
         border: solid $accent;
         text-style: bold;
+    }
+
+    ButtonControls > Button.-primary:focus {
+        text-style: bold reverse;
+        background: $primary 20%;
+        border: solid $primary;
+        color: $foreground;
     }
     """
 

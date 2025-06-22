@@ -21,6 +21,15 @@ class StatusBar(Static):
         margin-bottom: 1;
     }
 
+    /* Container focus support - Bagels pattern */
+    StatusBar:focus {
+        border: round $accent;
+    }
+
+    StatusBar:focus-within {
+        border: round $accent;
+    }
+
     .daemon-running {
         color: $success;
         text-style: bold;

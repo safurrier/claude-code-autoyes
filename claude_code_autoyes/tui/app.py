@@ -9,7 +9,7 @@ from textual.widgets import Button
 from ..core.config import ConfigManager
 from ..core.daemon import DaemonManager
 from ..core.detector import ClaudeDetector
-from .components import InstanceTable
+from .components import InstanceTable, Jumper, JumpOverlay
 from .pages import MainPage
 from .themes import THEMES
 
@@ -27,7 +27,8 @@ class ClaudeAutoYesApp(App[None]):
         ("d", "toggle_daemon", "Toggle Daemon"),
         ("r", "refresh", "Refresh"),
         ("t", "cycle_theme", "Cycle Theme"),
-        ("q", "quit", "Quit"),
+        ("v", "toggle_jump_mode", "Jump Mode"),
+        ("ctrl+q", "quit", "Quit"),
     ]
 
     CSS = """
@@ -38,6 +39,9 @@ class ClaudeAutoYesApp(App[None]):
 
     # Theme reactive - follows Bagels pattern
     app_theme: reactive[str] = reactive("dracula", init=False)
+    
+    # Jump mode reactive - follows Bagels pattern
+    _jumping: reactive[bool] = reactive(False, init=False, bindings=True)
 
     def __init__(
         self,
@@ -52,6 +56,9 @@ class ClaudeAutoYesApp(App[None]):
         self.detector = detector or ClaudeDetector()
         self.config = config or ConfigManager()
         self.daemon = daemon or DaemonManager()
+        
+        # Initialize jumper for navigation - will be set up in on_mount
+        self.jumper: Jumper | None = None
 
     def get_css_variables(self) -> dict[str, str]:
         """Apply theme CSS variables - Bagels pattern."""
@@ -88,6 +95,22 @@ class ClaudeAutoYesApp(App[None]):
         # Set up auto-refresh intervals with performance optimization
         self.set_interval(self.config.refresh_interval, self.refresh_instances)
         self.set_interval(5, self.update_daemon_status)
+        
+        # Initialize jumper with component mappings
+        self.jumper = Jumper(
+            {
+                "instance-table-container": "t",
+                "button-controls": "b", 
+                "status-bar": "s",
+                "enable-all": "e",
+                "disable-all": "d",
+                "refresh": "r",
+                "start-daemon": "m",
+                "stop-daemon": "n",
+                "quit": "q",
+            },
+            screen=self.screen,
+        )
 
         # Set initial focus to instance table for keyboard navigation
         try:
@@ -194,8 +217,8 @@ class ClaudeAutoYesApp(App[None]):
         """Toggle ninth Claude instance."""
         self._toggle_instance_by_index(8)
 
-    async def key_q(self) -> None:
-        """Quit the application."""
+    async def key_ctrl_q(self) -> None:
+        """Quit the application with Ctrl+Q."""
         await self.action_quit()
 
     def key_r(self) -> None:
@@ -232,6 +255,45 @@ class ClaudeAutoYesApp(App[None]):
         )
         next_index = (current_index + 1) % len(theme_names)
         self.app_theme = theme_names[next_index]
+
+    def action_toggle_jump_mode(self) -> None:
+        """Toggle jump mode navigation."""
+        if self.jumper:
+            self._jumping = not self._jumping
+
+    def watch__jumping(self, jumping: bool) -> None:
+        """Handle jump mode state changes."""
+        if jumping and self.jumper:
+            # Show jump overlay
+            self.push_screen(JumpOverlay(self.jumper), callback=self._handle_jump_target)
+
+    def _handle_jump_target(self, target: Any | None) -> None:
+        """Handle jump target selection."""
+        if target is None:
+            # Dismissed without selection
+            return
+            
+        # Only process Widget targets
+        from textual.widget import Widget
+        if not isinstance(target, Widget):
+            return
+            
+        try:
+            # Focus the target widget
+            if hasattr(target, 'focus'):
+                target.focus()
+            elif hasattr(target, 'can_focus') and target.can_focus:
+                self.set_focus(target)
+            else:
+                # If not focusable, try to click it
+                if hasattr(target, 'post_message') and hasattr(target, 'Clicked'):
+                    target.post_message(target.Clicked())
+        except Exception:
+            # Fallback: just try to focus
+            try:
+                self.set_focus(target)
+            except Exception:
+                pass  # Ignore if focus fails
 
     async def action_quit(self) -> None:
         """Quit the application safely."""

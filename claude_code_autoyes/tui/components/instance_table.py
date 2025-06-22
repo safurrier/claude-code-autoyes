@@ -24,6 +24,15 @@ class InstanceTable(Container):
         margin-bottom: 1;
     }
 
+    /* Container focus support - Bagels pattern */
+    InstanceTable:focus {
+        border: round $accent;
+    }
+
+    InstanceTable:focus-within {
+        border: round $accent;
+    }
+
     InstanceTable > DataTable {
         background: $surface;
     }
