@@ -4,7 +4,7 @@ import importlib.util
 
 import click
 
-# Import the tui module directly to avoid package/module conflicts
+# Import the modular TUI directly (now the primary implementation)
 from ..tui.app import run_new_tui
 
 
@@ -12,7 +12,7 @@ from ..tui.app import run_new_tui
 @click.option(
     "--version",
     type=click.Choice(["original", "new"]),
-    default="original",
+    default="new",  # Default to new modular architecture
     help="TUI version to launch (original or new)",
 )
 def tui(version: str) -> None:
@@ -20,7 +20,7 @@ def tui(version: str) -> None:
     if version == "new":
         run_new_tui()
     else:
-        # Import the original TUI module
+        # Import the original TUI module for compatibility
         from pathlib import Path
 
         parent_dir = Path(__file__).parent.parent

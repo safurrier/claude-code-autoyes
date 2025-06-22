@@ -4,12 +4,12 @@ from typing import Any
 
 from textual.app import ComposeResult
 from textual.containers import Container
-from textual.widgets import Header
+from textual.widgets import Footer, Header
 
 from ...core.config import ConfigManager
 from ...core.daemon import DaemonManager
 from ...core.detector import ClaudeDetector
-from ..components import ButtonControls, InstanceTable, ShortcutsBar, StatusBar
+from ..components import ButtonControls, InstanceTable, StatusBar
 
 
 class MainPage(Container):
@@ -56,8 +56,8 @@ class MainPage(Container):
             # Button controls
             yield ButtonControls(config=self.config, daemon=self.daemon)
 
-            # Shortcuts help
-            yield ShortcutsBar()
+        # Standard Footer widget for shortcuts
+        yield Footer()
 
     def on_mount(self) -> None:
         """Initialize the page when mounted."""

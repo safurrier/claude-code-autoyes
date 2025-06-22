@@ -37,7 +37,7 @@ class ClaudeAutoYesNewApp(App[None]):
     """
 
     # Theme reactive - follows Bagels pattern
-    app_theme: reactive[str] = reactive("default", init=False)
+    app_theme: reactive[str] = reactive("dark", init=False)
 
     def __init__(
         self,
@@ -85,19 +85,43 @@ class ClaudeAutoYesNewApp(App[None]):
         main_page = self.query_one(MainPage)
         main_page.rebuild()
 
-        # Set up auto-refresh intervals
+        # Set up auto-refresh intervals with performance optimization
         self.set_interval(self.config.refresh_interval, self.refresh_instances)
         self.set_interval(5, self.update_daemon_status)
+
+        # Set initial focus to instance table for keyboard navigation
+        try:
+            instance_table = self.query_one(InstanceTable)
+            if instance_table.table:
+                self.set_focus(instance_table.table)
+        except Exception:
+            pass  # Table might not be mounted yet
 
     def refresh_instances(self) -> None:
         """Refresh the list of Claude instances."""
         main_page = self.query_one(MainPage)
         main_page.rebuild()
 
+        # Maintain focus on table after refresh (Bagels pattern)
+        try:
+            instance_table = self.query_one(InstanceTable)
+            if instance_table.table and not instance_table.table.has_focus:
+                self.set_focus(instance_table.table)
+        except Exception:
+            pass
+
     def update_daemon_status(self) -> None:
         """Update the daemon status display."""
         main_page = self.query_one(MainPage)
         main_page.rebuild()
+
+        # Maintain focus on table after status update
+        try:
+            instance_table = self.query_one(InstanceTable)
+            if instance_table.table and not instance_table.table.has_focus:
+                self.set_focus(instance_table.table)
+        except Exception:
+            pass
 
     async def on_button_pressed(self, event: Button.Pressed) -> None:
         """Handle button clicks."""
