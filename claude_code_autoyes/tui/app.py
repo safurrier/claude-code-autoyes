@@ -37,7 +37,7 @@ class ClaudeAutoYesNewApp(App[None]):
     """
 
     # Theme reactive - follows Bagels pattern
-    app_theme: reactive[str] = reactive("dark", init=False)
+    app_theme: reactive[str] = reactive("dracula", init=False)
 
     def __init__(
         self,
