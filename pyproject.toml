@@ -49,13 +49,17 @@ testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
-addopts = "-v --tb=short --strict-markers"
+addopts = "-v --tb=short --strict-markers --cov-context=test"
 markers = [
     "e2e: end-to-end tests",
     "smoke: smoke tests",
     "integration: integration tests", 
     "unit: unit tests",
 ]
+
+[tool.coverage.run]
+parallel = false  # Disable parallel coverage to prevent .coverage.* files
+data_file = ".coverage"  # Use single coverage file
 filterwarnings = [
     "ignore::DeprecationWarning",
 ]

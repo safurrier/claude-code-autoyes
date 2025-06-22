@@ -76,18 +76,23 @@ clean: clean-pyc clean-test clean-venv
 #########################
 test: setup  # Run pytest with coverage
 	uv run -m pytest tests --cov=$(MODULE_NAME) --cov-report=term-missing
+	@rm -f .coverage.*  # Clean up coverage temp files
 
 test-smoke: setup  # Run smoke tests only (fast)
 	uv run -m pytest tests/smoke/ -v -x
+	@rm -f .coverage.*  # Clean up coverage temp files
 
 test-e2e: setup  # Run end-to-end tests
 	uv run -m pytest tests/e2e/ -v
+	@rm -f .coverage.*  # Clean up coverage temp files
 
 test-integration: setup  # Run integration tests  
 	uv run -m pytest tests/integration/ -v
+	@rm -f .coverage.*  # Clean up coverage temp files
 
 test-unit: setup  # Run unit tests
 	uv run -m pytest tests/unit/ -v
+	@rm -f .coverage.*  # Clean up coverage temp files
 
 mypy: setup  # Run type checking
 	uv run -m mypy $(MODULE_NAME)
@@ -99,6 +104,7 @@ format: setup  # Run ruff formatter
 	uv run -m ruff format $(MODULE_NAME)
 
 check: setup lint format test mypy  # Run all quality checks
+	@rm -f .coverage.*  # Clean up any remaining coverage temp files
 
 # Documentation
 ###############
