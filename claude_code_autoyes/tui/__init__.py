@@ -1,6 +1,5 @@
 """Modular TUI package for Claude Code AutoYes."""
 
-# Import the new app to avoid conflicts with the original tui.py module
-from .app import ClaudeAutoYesNewApp
+from .app import ClaudeAutoYesApp
 
-__all__ = ["ClaudeAutoYesNewApp"]
+__all__ = ["ClaudeAutoYesApp"]

@@ -14,8 +14,8 @@ from .pages import MainPage
 from .themes import THEMES
 
 
-class ClaudeAutoYesNewApp(App[None]):
-    """New modular TUI application with full feature parity."""
+class ClaudeAutoYesApp(App[None]):
+    """Modular TUI application with full feature parity."""
 
     TITLE = "Claude Auto YES"
 
@@ -248,11 +248,11 @@ class ClaudeAutoYesNewApp(App[None]):
             self.notify(f"Toggled {pane_id}")
 
 
-def run_new_tui(
+def run_tui(
     detector: ClaudeDetector | None = None,
     config: ConfigManager | None = None,
     daemon: DaemonManager | None = None,
 ) -> None:
-    """Run the new modular TUI application."""
-    app = ClaudeAutoYesNewApp(detector=detector, config=config, daemon=daemon)
+    """Run the modular TUI application."""
+    app = ClaudeAutoYesApp(detector=detector, config=config, daemon=daemon)
     app.run()
