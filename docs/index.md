@@ -1,91 +1,117 @@
 # Claude Code Auto-Yes
 
-Automatically respond "yes" to prompts in Claude Code sessions running in tmux.
+Automatically respond to Claude Code prompts in tmux sessions. No more manual clicking - stay focused on your work.
 
-## What is Claude Code Auto-Yes?
+## The Problem
 
-Claude Code Auto-Yes is a tool that monitors your tmux sessions for Claude Code instances and automatically responds "yes" to confirmation prompts. This eliminates the need to manually confirm actions during development workflows.
+Claude Code frequently asks "Do you want to continue?" and similar confirmation prompts. These interruptions break your flow, and you sometimes miss prompts when stepping away from your screen.
 
-## Features
+## The Solution
 
-- 🤖 **Automatic prompt detection** - Finds Claude prompts using smart pattern matching
-- 🎯 **Tmux integration** - Works seamlessly with tmux sessions  
-- 🔧 **Session management** - Enable/disable auto-yes per session
-- 🖥️ **Interactive TUI** - Manage sessions with a beautiful terminal interface
-- ⚡ **CLI commands** - Quick status checks and daemon control
-- 🛡️ **Safe operation** - Process-based detection to avoid false positives
+Claude Code Auto-Yes watches your tmux sessions and automatically responds to these prompts. When Claude asks "Do you want to continue?", the tool sends "yes" for you. When it asks "Proceed?", you get automatic confirmation.
+
+You stay in control:
+- Enable auto-yes for sessions where you want full automation
+- Leave it disabled when you need to review each step carefully
+- Toggle specific Claude instances on or off through a simple interface
 
 ## Quick Start
 
-### Installation
+The fastest way to get running:
 
 ```bash
-# Install via UV tool
-uv tool install claude-code-autoyes
+# Install the tool
+uv tool install git+https://github.com/safurrier/claude-code-autoyes.git
 
-# Or install from source
-git clone https://github.com/safurrier/claude-code-autoyes.git
-cd claude-code-autoyes
-make dev-install
-```
-
-### Basic Usage
-
-```bash
-# Check current status
+# Check what Claude sessions are running
 claude-code-autoyes status
 
-# Launch interactive TUI
-claude-code-autoyes tui
-
-# Enable auto-yes for all Claude sessions
+# Enable auto-yes for all of them
 claude-code-autoyes enable-all
 
 # Start the background daemon
 claude-code-autoyes daemon start
 ```
 
+Now when Claude prompts you, the tool automatically responds. To see everything in action, launch the interactive interface:
+
+```bash
+claude-code-autoyes
+```
+
+## What You Get
+
+**Visual Control**: An interactive terminal interface showing all your Claude instances with real-time status updates.
+
+**Smart Detection**: Automatically finds Claude Code processes running in tmux panes without any configuration.
+
+**Selective Automation**: Enable auto-yes for some sessions while keeping manual control over others.
+
+**Background Monitoring**: A daemon that watches enabled sessions and responds to prompts even when you're not looking.
+
+**Multiple Themes**: Choose from 11 beautiful color schemes including Dracula, Nord, and Gruvbox.
+
+**Quick Navigation**: Jump mode lets you navigate the entire interface with single keystrokes.
+
 ## How It Works
 
-1. **Detection**: Scans tmux panes for Claude Code processes
-2. **Monitoring**: Background daemon watches enabled sessions for prompts
-3. **Response**: Automatically sends "Enter" key when Claude prompts are detected
-4. **Control**: Fine-grained control over which sessions have auto-yes enabled
+The tool scans your tmux sessions looking for processes with "claude" in the name. For each Claude instance it finds, it can monitor that tmux pane for specific prompt patterns:
+
+- "Do you want to"
+- "Would you like to"
+- "Proceed?"
+- "❯ 1. Yes"
+
+When one of these patterns appears in an enabled session, the daemon automatically sends an "Enter" keypress to that tmux pane. It's that straightforward.
+
+## Beyond the Basics
+
+Once you're comfortable with the basics, you can:
+
+- **Fine-tune control** by enabling only specific Claude instances instead of all of them
+- **Use keyboard shortcuts** to instantly toggle sessions (press 1-9 for quick access)
+- **Monitor daemon logs** if something isn't working as expected
+- **Try different themes** to match your terminal setup
+
+The tool includes comprehensive commands for every scenario, from quick status checks to detailed daemon management.
+
+## Getting Help
+
+- **Quick reference**: Run `claude-code-autoyes --help` to see all available commands
+- **Detailed guides**: Check the [Getting Started](getting-started.md) page for step-by-step instructions
+- **Development info**: See [Development](development.md) if you want to contribute or modify the tool
 
 ## Installation Options
 
-### End Users
-
+**Global tool** (recommended):
 ```bash
-# Install as a UV tool (recommended)
-uv tool install claude-code-autoyes
-
-# Or use pip
-pip install claude-code-autoyes
+uv tool install git+https://github.com/safurrier/claude-code-autoyes.git
 ```
 
-### Developers
-
+**Run without installing**:
 ```bash
-# Clone and set up development environment
+git clone https://github.com/safurrier/claude-code-autoyes.git
+cd claude-code-autoyes
+uv run claude_code_autoyes.py
+```
+
+**Development setup**:
+```bash
 git clone https://github.com/safurrier/claude-code-autoyes.git
 cd claude-code-autoyes
 make setup
-make dev-install
 ```
 
-## Development
+## Requirements
 
-See the [Getting Started](getting-started.md) guide for detailed development instructions.
+- **tmux** - This tool only works with Claude Code running in tmux sessions. [Install tmux](https://github.com/tmux/tmux/wiki/Installing) if you don't have it.
+- **Python 3.9+**
+- **Claude Code** running in tmux panes
 
-## Contributing
+**Important**: Claude Code must be running inside tmux sessions for this tool to detect and monitor it.
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Run the test suite: `make check`
-5. Submit a pull request
+That's it. No complex setup, no configuration files, no database backends.
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+MIT License - use it however you want.
