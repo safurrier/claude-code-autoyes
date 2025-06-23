@@ -1,12 +1,12 @@
 # Claude Code AutoYes
 
-Stop clicking "yes" on every Claude Code prompt. This tool monitors your tmux sessions and automatically responds to confirmation prompts, so you can focus on coding instead of clicking.
+Automatically respond to Claude Code prompts in tmux sessions. No more manual clicking - stay focused on your work.
 
 ## Why You Need This
 
-When using Claude Code, you constantly get prompted with "Do you want to continue?" and similar questions. If you're in a flow state, these interruptions kill your momentum. You start a script, walk away for coffee, and come back to find it stopped waiting for a response you never saw.
+Claude Code frequently asks "Do you want to continue?" and similar confirmation prompts. These interruptions break your flow, and you sometimes miss prompts when stepping away from your screen.
 
-This tool solves that by watching your Claude sessions and automatically responding "yes" when appropriate. You stay in control - enable it for sessions where you want automation, leave it off when you need to review each step.
+This tool monitors your tmux sessions and automatically responds to these prompts. You control which sessions get automated responses and which ones you want to handle manually.
 
 ## Quick Start
 
@@ -99,9 +99,12 @@ claude-code-autoyes disable work:1
 uv tool install git+https://github.com/safurrier/claude-code-autoyes.git
 ```
 
-**UV Script** (portable - no installation):
+**UV Script** (run without installing):
 ```bash
-curl -s https://raw.githubusercontent.com/safurrier/claude-code-autoyes/main/claude_code_autoyes.py | uv run --script -
+# Clone and run directly
+git clone https://github.com/safurrier/claude-code-autoyes.git
+cd claude-code-autoyes
+uv run claude_code_autoyes.py
 ```
 
 **Development Setup** (if you want to hack on it):
@@ -135,9 +138,11 @@ When using the TUI:
 
 ## Requirements
 
-- Python 3.9 or newer
-- tmux (this tool is useless without it)
-- Claude Code running in tmux sessions
+- **tmux** - This tool only works with Claude Code running in tmux sessions. [Install tmux](https://github.com/tmux/tmux/wiki/Installing) if you don't have it.
+- **Python 3.9+** 
+- **Claude Code** running in tmux panes
+
+**Important**: Claude Code must be running inside tmux sessions for this tool to detect and monitor it.
 
 ## Development
 

@@ -1,49 +1,41 @@
 # Getting Started
 
-This guide will help you get started with claude-code-autoyes, a tool that automatically responds "yes" to Claude Code prompts in tmux sessions.
+This guide will get you up and running with claude-code-autoyes in just a few minutes.
 
 ## Prerequisites
 
-- Python 3.10 or higher
-- tmux (for session monitoring)
-- Git (for development)
+**Required:**
+- **tmux** - This tool only works with Claude Code running in tmux sessions. [Install tmux](https://github.com/tmux/tmux/wiki/Installing) if you don't have it.
+- **Python 3.9+**
+- **Claude Code** running in tmux panes
+
+**Important**: Claude Code must be running inside tmux sessions for this tool to detect and monitor it.
 
 ## Installation
 
-### End Users
-
 Install using UV (recommended):
 ```bash
-uv tool install claude-code-autoyes
+uv tool install git+https://github.com/safurrier/claude-code-autoyes.git
 ```
 
-Or install from PyPI:
+Or run without installing:
 ```bash
-pip install claude-code-autoyes
+git clone https://github.com/safurrier/claude-code-autoyes.git
+cd claude-code-autoyes
+uv run claude_code_autoyes.py
 ```
 
-### Developers
+## Typical Workflow
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/safurrier/claude-code-autoyes.git
-   cd claude-code-autoyes
-   ```
+Here's the standard way to use the tool:
 
-2. Set up the development environment:
-   ```bash
-   make setup
-   ```
+1. **Start Claude Code in tmux**: Launch your Claude Code session within a tmux session
+2. **Check sessions**: Use `claude-code-autoyes status` to see detected Claude sessions
+3. **Enable auto-yes**: Use `claude-code-autoyes enable-all` or enable specific sessions via TUI
+4. **Start daemon**: Run `claude-code-autoyes daemon start` to begin monitoring
+5. **Work normally**: The tool will automatically respond to Claude prompts
 
-3. Install development tools:
-   ```bash
-   make dev-install
-   ```
-
-4. Run the tests to verify everything works:
-   ```bash
-   make test
-   ```
+*[Screenshot placeholder: Terminal showing typical workflow commands and output]*
 
 ## Basic Usage
 
@@ -64,6 +56,8 @@ Launch the interactive TUI:
 claude-code-autoyes tui
 ```
 
+*[Screenshot placeholder: TUI interface showing Claude instances and controls]*
+
 ### Daemon Control
 
 Start the background daemon:
@@ -81,14 +75,6 @@ Stop the daemon:
 claude-code-autoyes daemon stop
 ```
 
-## Typical Workflow
-
-1. **Start Claude Code in tmux**: Launch your Claude Code session within a tmux session
-2. **Check sessions**: Use `claude-code-autoyes status` to see detected Claude sessions
-3. **Enable auto-yes**: Use `claude-code-autoyes enable-all` or enable specific sessions via TUI
-4. **Start daemon**: Run `claude-code-autoyes daemon start` to begin monitoring
-5. **Work normally**: The tool will automatically respond to Claude prompts
-
 ## Interactive TUI
 
 The Terminal User Interface provides a visual way to manage sessions:
@@ -96,6 +82,8 @@ The Terminal User Interface provides a visual way to manage sessions:
 ```bash
 claude-code-autoyes tui
 ```
+
+*[Demo placeholder: Animated GIF showing TUI navigation and theme switching]*
 
 Features:
 - View all tmux sessions and panes
@@ -121,7 +109,7 @@ Features:
 ### Detection Process
 
 1. **Session Discovery**: Scans tmux sessions for running processes
-2. **Claude Identification**: Looks for `claude_code_autoyes`, `claude-code-autoyes`, or `claude-autoyes` processes
+2. **Claude Identification**: Looks for processes with "claude" in the name (case-insensitive)
 3. **Prompt Monitoring**: Watches enabled sessions for specific prompt patterns:
    - "Do you want to"
    - "Would you like to"
@@ -153,48 +141,6 @@ Features:
 - Check that prompts match the expected patterns
 - Ensure no conflicting input is being sent to the session
 
-## Development Workflow
-
-1. Make your changes to the code
-2. Add or update tests as needed
-3. Run quality checks:
-   ```bash
-   make check
-   ```
-4. Update documentation if needed
-5. Commit your changes
-6. Create a pull request
-
-## Available Commands
-
-Run `make` to see all available commands:
-
-- `make setup` - Set up development environment
-- `make test` - Run tests with coverage
-- `make lint` - Run linting
-- `make format` - Format code
-- `make mypy` - Run type checking
-- `make check` - Run all quality checks
-- `make docs-serve` - Serve documentation locally
-- `make docs-build` - Build documentation
-
-## Testing
-
-Run the test suite:
-```bash
-make test
-```
-
-Run specific tests:
-```bash
-uv run -m pytest tests/test_specific.py::test_function_name
-```
-
-Run tests with coverage:
-```bash
-make test-coverage
-```
-
 ## Documentation
 
 ### Viewing Documentation
@@ -214,3 +160,72 @@ make docs-build
 ```
 
 The built documentation will be in the `site/` directory.
+
+## Development
+
+Want to contribute or modify the tool?
+
+### Development Setup
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/safurrier/claude-code-autoyes.git
+   cd claude-code-autoyes
+   ```
+
+2. Set up the development environment:
+   ```bash
+   make setup
+   ```
+
+3. Install development tools:
+   ```bash
+   make dev-install
+   ```
+
+4. Run the tests to verify everything works:
+   ```bash
+   make test
+   ```
+
+### Development Workflow
+
+1. Make your changes to the code
+2. Add or update tests as needed
+3. Run quality checks:
+   ```bash
+   make check
+   ```
+4. Update documentation if needed
+5. Commit your changes
+6. Create a pull request
+
+### Available Commands
+
+Run `make` to see all available commands:
+
+- `make setup` - Set up development environment
+- `make test` - Run tests with coverage
+- `make lint` - Run linting
+- `make format` - Format code
+- `make mypy` - Run type checking
+- `make check` - Run all quality checks
+- `make docs-serve` - Serve documentation locally
+- `make docs-build` - Build documentation
+
+### Testing
+
+Run the test suite:
+```bash
+make test
+```
+
+Run specific tests:
+```bash
+uv run -m pytest tests/test_specific.py::test_function_name
+```
+
+Run tests with coverage:
+```bash
+make test-coverage
+```

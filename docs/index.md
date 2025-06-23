@@ -1,12 +1,10 @@
 # Claude Code Auto-Yes
 
-Stop clicking "yes" on every Claude Code prompt. This tool monitors your tmux sessions and automatically responds to confirmation prompts, so you can focus on coding instead of clicking.
+Automatically respond to Claude Code prompts in tmux sessions. No more manual clicking - stay focused on your work.
 
 ## The Problem
 
-You're using Claude Code and hitting your flow state. Code is working, ideas are flowing, and then... "Do you want to continue?" appears on screen. You click yes. Two minutes later: "Would you like to proceed?" Another click. Then you step away for coffee and come back to find your script stopped, waiting for a response you never saw.
-
-These constant interruptions break your concentration and slow down your workflow.
+Claude Code frequently asks "Do you want to continue?" and similar confirmation prompts. These interruptions break your flow, and you sometimes miss prompts when stepping away from your screen.
 
 ## The Solution
 
@@ -90,9 +88,11 @@ The tool includes comprehensive commands for every scenario, from quick status c
 uv tool install git+https://github.com/safurrier/claude-code-autoyes.git
 ```
 
-**Portable script** (no installation):
+**Run without installing**:
 ```bash
-curl -s https://raw.githubusercontent.com/safurrier/claude-code-autoyes/main/claude_code_autoyes.py | uv run --script -
+git clone https://github.com/safurrier/claude-code-autoyes.git
+cd claude-code-autoyes
+uv run claude_code_autoyes.py
 ```
 
 **Development setup**:
@@ -104,9 +104,11 @@ make setup
 
 ## Requirements
 
-- Python 3.9 or newer
-- tmux for session management
-- Claude Code running in tmux sessions
+- **tmux** - This tool only works with Claude Code running in tmux sessions. [Install tmux](https://github.com/tmux/tmux/wiki/Installing) if you don't have it.
+- **Python 3.9+**
+- **Claude Code** running in tmux panes
+
+**Important**: Claude Code must be running inside tmux sessions for this tool to detect and monitor it.
 
 That's it. No complex setup, no configuration files, no database backends.
 
