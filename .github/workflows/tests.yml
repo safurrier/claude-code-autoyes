@@ -13,6 +13,26 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.12'
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y tmux ripgrep
+          
+      - name: Install Claude Code
+        run: |
+          npm install -g @anthropic-ai/claude-code
+          echo "$HOME/.npm/bin" >> $GITHUB_PATH
+          
+      - name: Verify Claude installation
+        run: |
+          claude --version || echo "Claude command not found in PATH"
+          which claude || echo "Claude binary not in PATH"
           
       - name: Install uv
         run: pip install uv

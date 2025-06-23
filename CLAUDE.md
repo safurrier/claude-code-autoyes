@@ -28,7 +28,7 @@ The project uses pre-commit hooks for mypy, linting, formatting, and tests.
 ## Development Workflow
 1. **Make changes**
 2. **Test locally**: `uv run mypy .` for type checking
-3. **Test E2E**: `uv run pytest tests/e2e/` for integration validation  
+3. **Test E2E**: `uv run pytest tests/e2e/` for integration validation
 4. **Commit normally**: Let pre-commit hooks run and catch issues
 5. **Never bypass safety nets**: Pre-commit hooks exist for a reason
 
@@ -70,7 +70,7 @@ gh run view <RUN_ID>
    ```bash
    # Run the same tests locally that failed in CI
    uv run -m pytest tests/e2e/ -v
-   
+
    # Compare with CI command from .github/workflows/tests.yml
    uv run -m pytest tests --cov=claude_code_autoyes --cov-report=term-missing
    ```
@@ -79,22 +79,62 @@ gh run view <RUN_ID>
 3. **Timing issues**: CI may have different timeout behavior
 4. **Dependencies**: Check if CI has all required dependencies
 
-### PR Update Workflow
-When CI fails due to outdated commits:
+## CI Debug Loop
+When CI tests are failing, use this iterative debugging workflow:
 
 ```bash
-# Check which commit the PR is testing
-gh pr view <PR_NUMBER> --json headRefOid,baseRefOid
+# 1. Make your changes and test locally first
+uv run -m pytest tests/path/to/failing/test.py -v
 
-# Compare with your latest local commits
-git log --oneline -5
+# 2. Commit and push changes
+git add .
+git commit -m "fix: Attempt to resolve CI test failures"
+git push
 
-# Push latest commits to update PR
-git push origin <branch-name>
+# 3. Wait for CI to run (2-3 minutes)
+sleep 180
 
-# Monitor new CI run
+# 4. Check CI status
 gh pr checks <PR_NUMBER>
+
+# 5. If still failing, analyze and fix
+gh run view --log-failed  # Review specific failures
+
+# 6. Amend the commit with fixes and force push
+git add .
+git commit --amend --no-edit
+git push --force-with-lease
+
+# 7. Repeat steps 3-6 until CI passes
 ```
+
+**Key Points:**
+- Always test locally before pushing
+- Use `--amend` to keep commit history clean
+- `--force-with-lease` is safer than `--force`
+- Wait adequate time between pushes for CI to complete
+
+## PR Review Comments
+
+To view PR review comments including line-specific feedback:
+
+```bash
+# View PR with general comments
+gh pr view <PR_NUMBER> --comments
+
+# Get detailed review comments via API (line-specific)
+gh api repos/OWNER/REPO/pulls/<PR_NUMBER>/comments
+
+# Get review-level comments
+gh api repos/OWNER/REPO/pulls/<PR_NUMBER>/reviews
+```
+
+**Example workflow for addressing PR feedback:**
+1. `gh pr view 13 --comments` - See general comments
+2. `gh api repos/safurrier/ai-sleepwalker/pulls/13/comments` - Get line-specific feedback
+3. Address each comment by fixing the code issues
+4. Use the CI debug loop above to test fixes
+
 
 ## Debugging Strategy
 1. **Reproduce locally**: Always run the failing command locally first
