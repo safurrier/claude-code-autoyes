@@ -1,4 +1,36 @@
-"""Unit tests for enhanced ClaudeDetector methods."""
+"""Unit tests for enhanced ClaudeDetector methods.
+
+These unit tests are valuable because they:
+
+1. **Test individual methods in isolation**: Each test focuses on one method's 
+   behavior without dependencies on other components
+   
+2. **Provide fast feedback**: Unit tests run quickly, enabling rapid development 
+   and debugging of specific functionality
+   
+3. **Document expected behavior**: Tests serve as living documentation of how 
+   each method should behave with various inputs
+   
+4. **Enable safe refactoring**: When we refactor the code, unit tests ensure 
+   individual methods still work correctly
+   
+5. **Test edge cases thoroughly**: We can easily test boundary conditions, 
+   malformed input, and error scenarios
+   
+6. **Scale with complexity**: As we encounter more edge cases in production, 
+   we can add specific unit tests to prevent regressions
+
+These are "true tests" because they:
+- Verify business logic correctness
+- Catch bugs early in development
+- Provide regression protection
+- Enable confident code changes
+
+The three test layers work together:
+- **Unit tests**: Individual method correctness
+- **Integration tests**: Component interaction
+- **E2E tests**: Real-world behavior validation
+"""
 
 from unittest.mock import Mock, patch
 

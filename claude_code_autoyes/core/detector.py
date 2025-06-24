@@ -168,34 +168,43 @@ class ClaudeDetector:
 
         return False
 
-    def is_claude_pane(self, content: str) -> bool:
-        """Detect if tmux pane content contains a Claude instance."""
-        # This is now a fallback method - prefer process detection
-        if not content:
-            return False
+    def _has_active_claude_cursor(self, content: str) -> bool:
+        """Check for active Claude interface with cursor."""
+        return "│ >" in content and "╰─" in content
 
-        # Primary signature: the box pattern with cursor (active Claude)
-        if "│ >" in content and "╰─" in content:
-            return True
+    def _has_claude_welcome_screen(self, content: str) -> bool:
+        """Check for Claude welcome/startup screen."""
+        return "Welcome to Claude Code" in content
 
-        # Enhanced: Claude welcome screen detection
-        if "Welcome to Claude Code" in content:
-            return True
-
-        # Enhanced: Claude interface with box patterns (even without cursor)
+    def _has_claude_interface_patterns(self, content: str) -> bool:
+        """Check for Claude interface patterns with specific indicators."""
         # Be more specific to avoid false positives from reports/logs about Claude
-        if (
+        return (
             "Claude Code" in content
             and "╰─" in content
             and ("cwd:" in content or "/help for help" in content or "Tip:" in content)
-        ):
-            return True
+        )
 
-        # Secondary: Claude update notification
-        if "✓ Update installed" in content and "Restart to apply" in content:
-            return True
+    def _has_claude_update_notification(self, content: str) -> bool:
+        """Check for Claude update notification."""
+        return "✓ Update installed" in content and "Restart to apply" in content
 
-        return False
+    def is_claude_pane(self, content: str) -> bool:
+        """Detect if tmux pane content contains a Claude instance.
+
+        This is a fallback method - prefer process detection.
+        Uses multiple pattern detection methods for comprehensive coverage.
+        """
+        if not content:
+            return False
+
+        # Check all pattern types
+        return (
+            self._has_active_claude_cursor(content)
+            or self._has_claude_welcome_screen(content)
+            or self._has_claude_interface_patterns(content)
+            or self._has_claude_update_notification(content)
+        )
 
     def has_auto_yes_prompt(self, content: str) -> bool:
         """Check if pane has a prompt that auto-yes should respond to."""

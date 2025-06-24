@@ -1,4 +1,32 @@
-"""Integration tests for child process discovery functionality."""
+"""Integration tests for child process discovery functionality.
+
+These tests are valuable because they:
+
+1. **Test component interaction**: Verify how find_child_processes() integrates 
+   with is_claude_process() without relying on real system processes
+   
+2. **Test complex logic paths**: The combination of subprocess calls, 
+   text parsing, and process tree traversal has many edge cases
+   
+3. **Provide predictable test scenarios**: Mock specific process trees 
+   to test detection logic that would be flaky with real processes
+   
+4. **Validate parsing logic**: Ensure ps command output parsing works 
+   correctly with various formats and edge cases
+   
+5. **Catch integration bugs**: Issues that unit tests (testing methods 
+   in isolation) might miss, like incorrect data flow between methods
+
+The mocking is necessary because real process discovery would be:
+- Flaky (processes come and go)
+- Environment-dependent (different processes on different machines)
+- Slow (actual subprocess calls)
+- Non-deterministic (can't control what processes exist)
+
+These tests complement:
+- Unit tests (individual method behavior)
+- E2E tests (real Claude detection in tmux)
+"""
 
 import subprocess
 from unittest.mock import Mock, patch
