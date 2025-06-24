@@ -15,6 +15,48 @@ class ClaudeDetector:
     detection (preferred) and content-based detection (fallback).
     """
 
+    def find_child_processes(self, parent_pid: str) -> list[dict[str, str]]:
+        """Find child processes of a given parent PID.
+
+        Args:
+            parent_pid: The parent process ID to search for children
+
+        Returns:
+            List of dictionaries with 'pid', 'ppid', and 'command' keys
+            for each child process found.
+        """
+        try:
+            result = subprocess.run(
+                ["ps", "-eo", "pid,ppid,command"],
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            if result.returncode != 0:
+                return []
+
+            children = []
+            lines = result.stdout.strip().split("\n")
+
+            # Skip header line
+            for line in lines[1:]:
+                parts = line.strip().split(None, 2)  # Split into max 3 parts
+                if len(parts) >= 3:
+                    pid, ppid, command = parts
+                    if ppid == parent_pid:
+                        children.append(
+                            {
+                                "pid": pid,
+                                "ppid": ppid,
+                                "command": command,
+                            }
+                        )
+
+            return children
+
+        except (subprocess.SubprocessError, OSError):
+            return []
+
     def get_pane_process_info(self, pane_id: str) -> dict[str, str]:
         """Get process information for a tmux pane.
 
@@ -54,6 +96,9 @@ class ClaudeDetector:
 
     def is_claude_process(self, process_info: dict[str, str]) -> bool:
         """Check if a process is a Claude instance based on process info.
+
+        Enhanced to check child processes for Claude instances that run
+        as children of shell processes.
 
         Args:
             process_info: Dictionary with command and pid information.
@@ -96,29 +141,70 @@ class ClaudeDetector:
                     ]
                     # Exclude claude-squad even in node processes
                     if "claude-squad" not in full_command:
-                        return any(
+                        if any(
                             indicator in full_command for indicator in claude_indicators
-                        )
+                        ):
+                            return True
             except (subprocess.SubprocessError, OSError):
+                pass
+
+        # Enhanced: Check child processes for Claude instances
+        # This handles the common case where tmux reports a shell (node)
+        # but Claude actually runs as a child process
+        if pid:
+            try:
+                children = self.find_child_processes(pid)
+                for child in children:
+                    child_command = child.get("command", "")
+                    # Look for direct Claude command in children
+                    if child_command == "claude":
+                        return True
+                    # Also check if child command starts with "claude" (e.g., "claude --some-flag")
+                    if child_command.startswith("claude "):
+                        return True
+            except Exception:
+                # Don't let child process discovery failures break detection
                 pass
 
         return False
 
+    def _has_active_claude_cursor(self, content: str) -> bool:
+        """Check for active Claude interface with cursor."""
+        return "│ >" in content and "╰─" in content
+
+    def _has_claude_welcome_screen(self, content: str) -> bool:
+        """Check for Claude welcome/startup screen."""
+        return "Welcome to Claude Code" in content
+
+    def _has_claude_interface_patterns(self, content: str) -> bool:
+        """Check for Claude interface patterns with specific indicators."""
+        # Be more specific to avoid false positives from reports/logs about Claude
+        return (
+            "Claude Code" in content
+            and "╰─" in content
+            and ("cwd:" in content or "/help for help" in content or "Tip:" in content)
+        )
+
+    def _has_claude_update_notification(self, content: str) -> bool:
+        """Check for Claude update notification."""
+        return "✓ Update installed" in content and "Restart to apply" in content
+
     def is_claude_pane(self, content: str) -> bool:
-        """Detect if tmux pane content contains a Claude instance."""
-        # This is now a fallback method - prefer process detection
+        """Detect if tmux pane content contains a Claude instance.
+
+        This is a fallback method - prefer process detection.
+        Uses multiple pattern detection methods for comprehensive coverage.
+        """
         if not content:
             return False
 
-        # Primary signature: the box pattern with cursor (active Claude)
-        if "│ >" in content and "╰─" in content:
-            return True
-
-        # Secondary: Claude update notification
-        if "✓ Update installed" in content and "Restart to apply" in content:
-            return True
-
-        return False
+        # Check all pattern types
+        return (
+            self._has_active_claude_cursor(content)
+            or self._has_claude_welcome_screen(content)
+            or self._has_claude_interface_patterns(content)
+            or self._has_claude_update_notification(content)
+        )
 
     def has_auto_yes_prompt(self, content: str) -> bool:
         """Check if pane has a prompt that auto-yes should respond to."""
