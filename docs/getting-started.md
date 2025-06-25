@@ -32,7 +32,7 @@ Here's the standard way to use the tool:
 1. **Start Claude Code in tmux**: Launch your Claude Code session within a tmux session
 2. **Check sessions**: Use `claude-code-autoyes status` to see detected Claude sessions
 3. **Enable auto-yes**: Use `claude-code-autoyes enable-all` or enable specific sessions via TUI
-4. **Start daemon**: Run `claude-code-autoyes daemon start` to begin monitoring
+4. **Start TUI**: Run `claude-code-autoyes` - the daemon starts automatically!
 5. **Work normally**: The tool will automatically respond to Claude prompts
 
 *[Screenshot placeholder: Terminal showing typical workflow commands and output]*
@@ -60,19 +60,13 @@ claude-code-autoyes tui
 
 ### Daemon Control
 
-Start the background daemon:
-```bash
-claude-code-autoyes daemon start
-```
+**The daemon runs automatically with the TUI** - no manual start/stop needed!
 
-Check daemon status:
+For advanced users who want manual control:
 ```bash
-claude-code-autoyes daemon status
-```
-
-Stop the daemon:
-```bash
-claude-code-autoyes daemon stop
+claude-code-autoyes daemon start    # Start manually
+claude-code-autoyes daemon status   # Check status  
+claude-code-autoyes daemon stop     # Stop manually
 ```
 
 ## Interactive TUI
@@ -98,7 +92,6 @@ Features:
 - `↑↓`: Navigate instances
 - `Enter/Space`: Toggle selected instance
 - `1-9`: Quick toggle by number
-- `d`: Toggle daemon
 - `r`: Refresh
 - `t`: Cycle themes
 - `v`: Jump Mode (quick navigation)

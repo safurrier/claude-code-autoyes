@@ -33,12 +33,7 @@ Session: work, Pane: 1 - Claude detected ❌ (disabled)
 claude-code-autoyes enable-all
 ```
 
-### Step 4: Start the Daemon
-```bash
-claude-code-autoyes daemon start
-```
-
-That's it! Now when Claude prompts you, the tool automatically responds. To see it in action, run the interactive TUI:
+That's it! Now when Claude prompts you, the tool automatically responds. The daemon starts automatically when you open the TUI:
 
 ```bash
 claude-code-autoyes
@@ -51,18 +46,14 @@ The TUI gives you real-time control over everything. Press individual number key
 **Pro tips:**
 - Press `t` to cycle through 11 themes (try Dracula or Nord)
 - Press `v` for jump mode - quick keyboard navigation to any part of the interface
-- Press `d` to toggle the daemon on/off
 - Use `Ctrl+Q` to quit (not just `q` - we learned that lesson)
+- The daemon runs automatically - no need to start it manually!
 
 ## When Things Go Wrong
 
 **"No sessions detected"**: Make sure Claude Code is actually running in a tmux session. This tool can't see processes outside tmux.
 
-**"Daemon not responding"**: Check if it's actually running with `claude-code-autoyes daemon status`. If it's stuck, restart it:
-```bash
-claude-code-autoyes daemon stop
-claude-code-autoyes daemon start
-```
+**"Daemon not responding"**: The daemon runs automatically with the TUI. If you're having issues, restart the TUI or check `claude-code-autoyes daemon status` for manual daemon control.
 
 **"It's not auto-responding"**: Verify the session is enabled with `claude-code-autoyes status`. The daemon only watches enabled sessions.
 
@@ -116,8 +107,10 @@ make setup
 
 ### Daemon Management
 
-The daemon runs in the background monitoring your enabled sessions. You can:
-- `claude-code-autoyes daemon start` - Start monitoring
+The daemon runs automatically when you use the TUI - no manual start/stop needed! The TUI starts the daemon when it launches and stops it when you quit.
+
+For manual control (advanced users):
+- `claude-code-autoyes daemon start` - Start monitoring manually
 - `claude-code-autoyes daemon stop` - Stop monitoring  
 - `claude-code-autoyes daemon status` - Check if it's running
 - `claude-code-autoyes daemon restart` - Restart if it gets stuck
@@ -130,7 +123,6 @@ When using the TUI:
 - `↑↓` - Navigate the list
 - `Enter` or `Space` - Toggle the selected session
 - `1-9` - Instantly toggle sessions by number
-- `d` - Start/stop the daemon
 - `r` - Refresh the session list
 - `t` - Cycle through themes
 - `v` - Jump mode (press letter keys to jump to interface elements)
