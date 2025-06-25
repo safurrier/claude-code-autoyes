@@ -137,8 +137,6 @@ class ButtonControls(Container):
         """Compose the button controls."""
         yield Button("Enable All", id="enable-all", variant="success")
         yield Button("Disable All", id="disable-all", variant="error")
-        yield Button("Start Daemon", id="start-daemon", variant="primary")
-        yield Button("Stop Daemon", id="stop-daemon", variant="primary")
         yield Button("Refresh", id="refresh", variant="primary")
         yield Button("Quit", id="quit")
 

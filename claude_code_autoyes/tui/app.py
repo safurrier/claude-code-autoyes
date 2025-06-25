@@ -25,7 +25,6 @@ class ClaudeAutoYesApp(App[None]):
         ("enter", "select", "Toggle"),
         ("space", "toggle", "Toggle"),
         ("1,2,3,4,5,6,7,8,9", "quick_toggle", "Quick Toggle"),
-        ("d", "toggle_daemon", "Toggle Daemon"),
         ("r", "refresh", "Refresh"),
         ("t", "cycle_theme", "Cycle Theme"),
         ("v", "toggle_jump_mode", "Jump Mode"),
@@ -109,8 +108,6 @@ class ClaudeAutoYesApp(App[None]):
                 "enable-all": "e",
                 "disable-all": "d",
                 "refresh": "r",
-                "start-daemon": "m",
-                "stop-daemon": "n",
                 "quit": "q",
             },
             screen=self.screen,
@@ -172,18 +169,6 @@ class ClaudeAutoYesApp(App[None]):
         elif button_id == "refresh":
             self.refresh_instances()
 
-        elif button_id == "start-daemon":
-            if self.daemon.start(self.config):
-                self.update_daemon_status()
-            else:
-                self.notify("Failed to start daemon", severity="error")
-
-        elif button_id == "stop-daemon":
-            if self.daemon.stop():
-                self.update_daemon_status()
-            else:
-                self.notify("Failed to stop daemon", severity="error")
-
         elif button_id == "quit":
             await self.action_quit()
 
@@ -231,21 +216,6 @@ class ClaudeAutoYesApp(App[None]):
     def key_r(self) -> None:
         """Refresh instances."""
         self.refresh_instances()
-
-    def key_d(self) -> None:
-        """Toggle daemon start/stop."""
-        if self.daemon.is_running():
-            if self.daemon.stop():
-                self.update_daemon_status()
-                self.notify("Daemon stopped", severity="warning")
-            else:
-                self.notify("Failed to stop daemon", severity="error")
-        else:
-            if self.daemon.start(self.config):
-                self.update_daemon_status()
-                self.notify("Daemon started")
-            else:
-                self.notify("Failed to start daemon", severity="error")
 
     def key_space(self) -> None:
         """Toggle currently highlighted instance with space bar."""
