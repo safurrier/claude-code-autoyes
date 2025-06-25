@@ -20,6 +20,7 @@ class ConfigManager:
         enabled_sessions: Set of enabled tmux session:pane identifiers
         daemon_enabled: Whether the daemon is enabled
         refresh_interval: How often to check for prompts (seconds)
+        auto_yes_enabled: Global toggle for auto-yes functionality
     """
 
     def __init__(self, config_file: str | None = None):
@@ -27,6 +28,7 @@ class ConfigManager:
         self.enabled_sessions: set[str] = set()
         self.daemon_enabled = False
         self.refresh_interval = DEFAULT_REFRESH_INTERVAL
+        self.auto_yes_enabled = True  # Default enabled
         self.load()
 
     def load(self) -> dict[str, Any]:
@@ -47,6 +49,7 @@ class ConfigManager:
                     self.refresh_interval = data.get(
                         "refresh_interval", DEFAULT_REFRESH_INTERVAL
                     )
+                    self.auto_yes_enabled = data.get("auto_yes_enabled", True)
                     return data
         except (json.JSONDecodeError, FileNotFoundError):
             pass
@@ -63,6 +66,7 @@ class ConfigManager:
                 "enabled_sessions": list(self.enabled_sessions),
                 "daemon_enabled": self.daemon_enabled,
                 "refresh_interval": self.refresh_interval,
+                "auto_yes_enabled": self.auto_yes_enabled,
             }
 
         try:

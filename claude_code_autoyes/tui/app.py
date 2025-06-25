@@ -8,6 +8,7 @@ from textual.widgets import Button
 
 from ..core.config import ConfigManager
 from ..core.daemon import DaemonManager
+from ..core.daemon_service import DaemonService
 from ..core.detector import ClaudeDetector
 from .components import InstanceTable, Jumper, JumpOverlay
 from .pages import MainPage
@@ -24,7 +25,6 @@ class ClaudeAutoYesApp(App[None]):
         ("enter", "select", "Toggle"),
         ("space", "toggle", "Toggle"),
         ("1,2,3,4,5,6,7,8,9", "quick_toggle", "Quick Toggle"),
-        ("d", "toggle_daemon", "Toggle Daemon"),
         ("r", "refresh", "Refresh"),
         ("t", "cycle_theme", "Cycle Theme"),
         ("v", "toggle_jump_mode", "Jump Mode"),
@@ -59,6 +59,9 @@ class ClaudeAutoYesApp(App[None]):
 
         # Initialize jumper for navigation - will be set up in on_mount
         self.jumper: Jumper | None = None
+
+        # Initialize daemon service for automatic lifecycle management
+        self.daemon_service: DaemonService | None = None
 
     def get_css_variables(self) -> dict[str, str]:
         """Apply theme CSS variables - Bagels pattern."""
@@ -105,8 +108,6 @@ class ClaudeAutoYesApp(App[None]):
                 "enable-all": "e",
                 "disable-all": "d",
                 "refresh": "r",
-                "start-daemon": "m",
-                "stop-daemon": "n",
                 "quit": "q",
             },
             screen=self.screen,
@@ -119,6 +120,9 @@ class ClaudeAutoYesApp(App[None]):
                 self.set_focus(instance_table.table)
         except Exception:
             pass  # Table might not be mounted yet
+
+        # Start daemon service automatically
+        self.start_daemon_on_mount()
 
     def refresh_instances(self) -> None:
         """Refresh the list of Claude instances."""
@@ -164,18 +168,6 @@ class ClaudeAutoYesApp(App[None]):
 
         elif button_id == "refresh":
             self.refresh_instances()
-
-        elif button_id == "start-daemon":
-            if self.daemon.start(self.config):
-                self.update_daemon_status()
-            else:
-                self.notify("Failed to start daemon", severity="error")
-
-        elif button_id == "stop-daemon":
-            if self.daemon.stop():
-                self.update_daemon_status()
-            else:
-                self.notify("Failed to stop daemon", severity="error")
 
         elif button_id == "quit":
             await self.action_quit()
@@ -224,21 +216,6 @@ class ClaudeAutoYesApp(App[None]):
     def key_r(self) -> None:
         """Refresh instances."""
         self.refresh_instances()
-
-    def key_d(self) -> None:
-        """Toggle daemon start/stop."""
-        if self.daemon.is_running():
-            if self.daemon.stop():
-                self.update_daemon_status()
-                self.notify("Daemon stopped", severity="warning")
-            else:
-                self.notify("Failed to stop daemon", severity="error")
-        else:
-            if self.daemon.start(self.config):
-                self.update_daemon_status()
-                self.notify("Daemon started")
-            else:
-                self.notify("Failed to start daemon", severity="error")
 
     def key_space(self) -> None:
         """Toggle currently highlighted instance with space bar."""
@@ -300,6 +277,9 @@ class ClaudeAutoYesApp(App[None]):
 
     async def action_quit(self) -> None:
         """Quit the application safely."""
+        # Stop daemon service before quitting
+        self.stop_daemon_on_exit()
+
         # Stop daemon before quitting
         if self.daemon.is_running():
             self.daemon.stop()
@@ -311,6 +291,42 @@ class ClaudeAutoYesApp(App[None]):
         pane_id = instance_table.toggle_by_index(index)
         if pane_id:
             self.notify(f"Toggled {pane_id}")
+
+    def start_daemon_on_mount(self) -> None:
+        """Start daemon service automatically when TUI mounts."""
+        if self.daemon_service is None:
+            self.daemon_service = DaemonService(self.config)
+
+        # Start daemon in background (non-blocking)
+        try:
+            import threading
+
+            daemon_thread = threading.Thread(
+                target=self.daemon_service.start_monitoring_loop, daemon=True
+            )
+            daemon_thread.start()
+        except Exception as e:
+            self.notify(f"Failed to start daemon service: {e}", severity="error")
+
+    def stop_daemon_on_exit(self) -> None:
+        """Stop daemon service when TUI exits."""
+        if self.daemon_service and self.daemon_service.running:
+            self.daemon_service.stop()
+
+    def refresh_global_toggle_state(self) -> None:
+        """Refresh the global toggle UI to reflect current config state."""
+        # This method will be implemented when we add the actual toggle widget
+        # For now, just ensure the config state is accessible
+        pass
+
+    def handle_global_toggle_change(self, new_value: bool) -> None:
+        """Handle global auto-yes toggle change.
+
+        Args:
+            new_value: New toggle state
+        """
+        self.config.auto_yes_enabled = new_value
+        self.config.save()
 
 
 def run_tui(

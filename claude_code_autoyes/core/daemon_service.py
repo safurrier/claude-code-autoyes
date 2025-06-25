@@ -80,6 +80,21 @@ class DaemonService:
         """Stop the monitoring loop."""
         self.running = False
 
+    def should_process_session(self, session_pane: str) -> bool:
+        """Check if a session should be processed for auto-yes.
+
+        Args:
+            session_pane: Session:pane identifier to check
+
+        Returns:
+            True if session should be processed (both enabled and global toggle on)
+        """
+        # Session must be in enabled_sessions AND global toggle must be on
+        session_enabled = session_pane in self.config.enabled_sessions
+        global_enabled = getattr(self.config, "auto_yes_enabled", True)
+
+        return session_enabled and global_enabled
+
     def _check_enabled_sessions(self) -> None:
         """Check all enabled sessions for prompts - equivalent to bash for loop."""
         for session_pane in self.config.enabled_sessions:
