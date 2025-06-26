@@ -36,6 +36,16 @@ make dev-uninstall
 | `make dev-logs` | Tail daemon logs |
 | `make dev-daemon-stop` | Stop daemon and clean up |
 
+### 📊 Performance Analysis Commands
+
+| Command | Purpose |
+|---------|---------|
+| `uv run python -m claude_code_autoyes debug --help` | Show all debug commands |
+| `uv run python -m claude_code_autoyes debug startup-time` | Measure TUI startup performance |
+| `uv run python -m claude_code_autoyes debug navigation-test` | Test navigation responsiveness |
+| `uv run python -m claude_code_autoyes debug profile` | Profile with py-spy (requires setup) |
+| `uv run python -m claude_code_autoyes tui --debug` | Launch TUI with debug mode |
+
 ### Testing Workflow
 
 #### 1. Test a Pull Request
@@ -77,6 +87,39 @@ The development commands use UV tool installation with a unique name:
 - **Tool name**: `claude-code-autoyes-test`
 - **Installation**: `uv tool install --from . --name claude-code-autoyes-test claude-code-autoyes`
 - **Isolation**: Won't conflict with your main installation
+
+## Performance Analysis
+
+### Setup Performance Tools
+```bash
+# Install optional performance dependencies
+uv sync --extra performance
+
+# Verify py-spy installation
+uv run py-spy --version
+```
+
+### Performance Testing Workflow
+```bash
+# Quick performance check
+uv run python -m claude_code_autoyes debug startup-time
+uv run python -m claude_code_autoyes debug navigation-test
+
+# Deep profiling (requires sudo on macOS)
+uv run python -m claude_code_autoyes tui &
+TUI_PID=$!
+sudo uv run py-spy record -p $TUI_PID -d 10 -o /tmp/profile.svg
+kill $TUI_PID
+# Open /tmp/profile.svg in browser
+
+# Run performance test suite
+uv run -m pytest tests/performance/ -v
+```
+
+### Performance Benchmarks
+- **Startup Time**: ~0.53s (good performance)
+- **Navigation**: ~0.056s average (excellent responsiveness)
+- **Import Overhead**: Textual ~0.086s, others <0.010s
 
 ## Daemon Testing
 

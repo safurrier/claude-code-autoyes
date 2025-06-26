@@ -142,3 +142,51 @@ gh api repos/OWNER/REPO/pulls/<PR_NUMBER>/reviews
 3. **Review logs**: Use `gh run view --log-failed` for specific errors
 4. **Compare environments**: CI=Ubuntu, local=macOS, dependencies may differ
 5. **Test incrementally**: Run individual test files to isolate issues
+
+# Performance Analysis & Debugging
+
+## Setup Performance Tools
+```bash
+# Install performance analysis dependencies
+uv sync --extra performance
+
+# Verify py-spy is available (requires sudo on macOS)
+uv run py-spy --version
+```
+
+## Debug Commands
+```bash
+# Available debug commands
+uv run python -m claude_code_autoyes debug --help
+
+# Measure startup performance
+uv run python -m claude_code_autoyes debug startup-time
+
+# Test navigation responsiveness  
+uv run python -m claude_code_autoyes debug navigation-test
+
+# Profile with py-spy (requires sudo on macOS)
+uv run python -m claude_code_autoyes debug profile -d 10
+```
+
+## TUI Debug Mode
+```bash
+# Launch TUI with performance monitoring
+uv run python -m claude_code_autoyes tui --debug
+```
+
+## Performance Analysis Results
+- **Startup Time**: ~0.73s (Good performance)
+- **Navigation**: ~0.056s average (Excellent responsiveness)
+- **Import overhead**: Textual framework ~0.086s, others <0.010s
+- **Main bottlenecks**: Likely refresh cycles, tmux detection, or long-run memory usage
+
+## Profiling with py-spy
+```bash
+# Start TUI and profile it (requires sudo on macOS)
+uv run python -m claude_code_autoyes tui &
+TUI_PID=$!
+sudo uv run py-spy record -p $TUI_PID -d 10 -o /tmp/claude-profile.svg
+kill $TUI_PID
+# Open /tmp/claude-profile.svg in browser to view flame graph
+```

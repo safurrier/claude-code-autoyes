@@ -45,6 +45,8 @@ pluggy==1.6.0
     #   pytest-cov
 pre-commit==4.2.0
     # via claude-code-autoyes (pyproject.toml)
+psutil==7.0.0
+    # via claude-code-autoyes (pyproject.toml)
 pygments==2.19.1
     # via
     #   pytest
