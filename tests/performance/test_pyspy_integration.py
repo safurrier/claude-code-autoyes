@@ -196,7 +196,7 @@ class TestProfilingWorkflow:
     def test_end_to_end_profiling_workflow(self):
         """Should support complete profiling workflow from discovery to analysis."""
         # This test should FAIL initially - complete workflow doesn't exist yet
-        from claude_code_autoyes.commands.debug import ProfileWorkflow
+        from claude_code_autoyes.core.performance import ProfileWorkflow
         
         workflow = ProfileWorkflow()
         
