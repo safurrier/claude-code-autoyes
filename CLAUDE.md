@@ -159,12 +159,6 @@ uv run py-spy --version
 # Available debug commands
 uv run python -m claude_code_autoyes debug --help
 
-# Measure startup performance
-uv run python -m claude_code_autoyes debug startup-time
-
-# Test navigation responsiveness  
-uv run python -m claude_code_autoyes debug navigation-test
-
 # Profile with py-spy (requires sudo on macOS)
 uv run python -m claude_code_autoyes debug profile -d 10
 ```
@@ -176,10 +170,11 @@ uv run python -m claude_code_autoyes tui --debug
 ```
 
 ## Performance Analysis Results
-- **Startup Time**: ~0.73s (Good performance)
-- **Navigation**: ~0.056s average (Excellent responsiveness)
+From performance spike conducted:
+- **Startup Time**: ~0.73s
+- **Navigation**: ~0.056s average
 - **Import overhead**: Textual framework ~0.086s, others <0.010s
-- **Main bottlenecks**: Likely refresh cycles, tmux detection, or long-run memory usage
+- **Main bottlenecks**: Likely refresh cycles, tmux detection, or memory usage over time
 
 ## Profiling with py-spy
 ```bash

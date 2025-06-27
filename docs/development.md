@@ -101,25 +101,21 @@ uv run py-spy --version
 
 ### Performance Testing Workflow
 ```bash
-# Quick performance check
-uv run python -m claude_code_autoyes debug startup-time
-uv run python -m claude_code_autoyes debug navigation-test
+# Profile running TUI with py-spy
+uv run python -m claude_code_autoyes debug profile -d 10 -o /tmp/profile.svg
 
-# Deep profiling (requires sudo on macOS)
+# Profiling requires TUI to be running first
 uv run python -m claude_code_autoyes tui &
 TUI_PID=$!
-sudo uv run py-spy record -p $TUI_PID -d 10 -o /tmp/profile.svg
+uv run python -m claude_code_autoyes debug profile -d 10
 kill $TUI_PID
-# Open /tmp/profile.svg in browser
+
+# Manual py-spy usage (requires sudo on macOS)
+sudo uv run py-spy record -p $TUI_PID -d 10 -o /tmp/profile.svg
 
 # Run performance test suite
 uv run -m pytest tests/performance/ -v
 ```
-
-### Performance Benchmarks
-- **Startup Time**: ~0.53s (good performance)
-- **Navigation**: ~0.056s average (excellent responsiveness)
-- **Import Overhead**: Textual ~0.086s, others <0.010s
 
 ## Daemon Testing
 

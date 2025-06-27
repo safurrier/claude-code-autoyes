@@ -74,10 +74,8 @@ claude-code-autoyes daemon stop     # Stop manually
 
 ### Performance Analysis
 
-Debug and analyze TUI performance:
+Profile TUI performance with py-spy:
 ```bash
-claude-code-autoyes debug startup-time     # Measure startup performance
-claude-code-autoyes debug navigation-test  # Test navigation responsiveness
 claude-code-autoyes debug profile          # Profile with py-spy (requires setup)
 claude-code-autoyes debug --help           # See all debug options
 ```

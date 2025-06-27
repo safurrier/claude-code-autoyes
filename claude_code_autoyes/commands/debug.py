@@ -7,8 +7,6 @@ from dataclasses import dataclass
 
 import click
 
-# Import ProfileWorkflow from performance module
-
 
 @dataclass
 class ProfileResult:
@@ -19,25 +17,8 @@ class ProfileResult:
     output_path: str | None = None
 
 
-@dataclass
-class NavigationBenchmark:
-    """Results from navigation performance benchmark."""
-
-    average_response_time: float
-    max_response_time: float
-    action_times: dict[str, float]
-
-
 class DebugCommands:
     """Performance debugging command implementations."""
-
-    def measure_startup_time(self) -> float:
-        """Measure TUI startup time."""
-        # Import here to avoid circular imports during startup measurement
-        from claude_code_autoyes.core.performance import StartupTimer
-
-        timer = StartupTimer()
-        return timer.measure_tui_startup()
 
     def check_pyspy_available(self) -> bool:
         """Check if py-spy is available on the system."""
@@ -106,23 +87,6 @@ class DebugCommands:
         except Exception as e:
             return ProfileResult(success=False, error=f"Profiling failed: {str(e)}")
 
-    def run_navigation_benchmark(self) -> NavigationBenchmark:
-        """Run navigation performance benchmark."""
-        # Import here to avoid circular imports
-        from claude_code_autoyes.core.performance import NavigationTimer
-
-        nav_timer = NavigationTimer()
-        action_times = nav_timer.measure_navigation_actions(
-            ["arrow_down", "arrow_up", "enter", "space", "tab"]
-        )
-
-        times = list(action_times.values())
-        return NavigationBenchmark(
-            average_response_time=sum(times) / len(times),
-            max_response_time=max(times),
-            action_times=action_times,
-        )
-
 
 @click.group()
 def debug() -> None:
@@ -159,53 +123,3 @@ def profile(duration: int, output: str | None) -> None:
         click.echo(f"🔍 Open {result.output_path} in a browser to view flame graph")
     else:
         click.echo(f"❌ Profiling failed: {result.error}")
-
-
-@debug.command(name="startup-time")
-def startup_time() -> None:
-    """Measure TUI startup time."""
-    debug_cmd = DebugCommands()
-
-    click.echo("⏱️  Measuring startup time...")
-    startup_time_ms = debug_cmd.measure_startup_time()
-
-    click.echo(f"🚀 Startup time: {startup_time_ms:.3f}s")
-
-    if startup_time_ms < 0.5:
-        click.echo("✅ Excellent startup performance")
-    elif startup_time_ms < 1.0:
-        click.echo("✅ Good startup performance")
-    elif startup_time_ms < 2.0:
-        click.echo("⚠️  Startup time could be improved")
-    else:
-        click.echo("❌ Slow startup - investigate bottlenecks")
-
-
-@debug.command(name="navigation-test")
-def navigation_test() -> None:
-    """Test navigation performance and responsiveness."""
-    debug_cmd = DebugCommands()
-
-    click.echo("⌨️  Running navigation benchmark...")
-
-    try:
-        results = debug_cmd.run_navigation_benchmark()
-
-        click.echo("📊 Navigation Performance Results:")
-        click.echo(f"  Average response time: {results.average_response_time:.3f}s")
-        click.echo(f"  Max response time: {results.max_response_time:.3f}s")
-
-        click.echo("📋 Individual action times:")
-        for action, time_ms in results.action_times.items():
-            status = "✅" if time_ms < 0.1 else "⚠️" if time_ms < 0.2 else "❌"
-            click.echo(f"  {action}: {time_ms:.3f}s {status}")
-
-        if results.average_response_time < 0.1:
-            click.echo("✅ Excellent navigation performance")
-        elif results.average_response_time < 0.2:
-            click.echo("✅ Good navigation performance")
-        else:
-            click.echo("❌ Navigation performance needs improvement")
-
-    except Exception as e:
-        click.echo(f"❌ Navigation test failed: {str(e)}")
