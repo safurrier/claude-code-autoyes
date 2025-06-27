@@ -481,6 +481,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#performance-analysis-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      📊 Performance Analysis Commands
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#testing-workflow" class="md-nav__link">
     <span class="md-ellipsis">
       Testing Workflow
@@ -533,6 +542,39 @@
       Tool Installation Details
     </span>
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#performance-analysis" class="md-nav__link">
+    <span class="md-ellipsis">
+      Performance Analysis
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Performance Analysis">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#setup-performance-tools" class="md-nav__link">
+    <span class="md-ellipsis">
+      Setup Performance Tools
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#performance-testing-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      Performance Testing Workflow
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -750,6 +792,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#performance-analysis-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      📊 Performance Analysis Commands
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#testing-workflow" class="md-nav__link">
     <span class="md-ellipsis">
       Testing Workflow
@@ -802,6 +853,39 @@
       Tool Installation Details
     </span>
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#performance-analysis" class="md-nav__link">
+    <span class="md-ellipsis">
+      Performance Analysis
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Performance Analysis">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#setup-performance-tools" class="md-nav__link">
+    <span class="md-ellipsis">
+      Setup Performance Tools
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#performance-testing-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      Performance Testing Workflow
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -969,6 +1053,37 @@
 </tr>
 </tbody>
 </table>
+<h3 id="performance-analysis-commands">📊 Performance Analysis Commands<a class="headerlink" href="#performance-analysis-commands" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>uv run python -m claude_code_autoyes debug --help</code></td>
+<td>Show all debug commands</td>
+</tr>
+<tr>
+<td><code>uv run python -m claude_code_autoyes debug startup-time</code></td>
+<td>Measure TUI startup performance</td>
+</tr>
+<tr>
+<td><code>uv run python -m claude_code_autoyes debug navigation-test</code></td>
+<td>Test navigation responsiveness</td>
+</tr>
+<tr>
+<td><code>uv run python -m claude_code_autoyes debug profile</code></td>
+<td>Profile with py-spy (requires setup)</td>
+</tr>
+<tr>
+<td><code>uv run python -m claude_code_autoyes tui --debug</code></td>
+<td>Launch TUI with debug mode</td>
+</tr>
+</tbody>
+</table>
 <h3 id="testing-workflow">Testing Workflow<a class="headerlink" href="#testing-workflow" title="Permanent link">&para;</a></h3>
 <h4 id="1-test-a-pull-request">1. Test a Pull Request<a class="headerlink" href="#1-test-a-pull-request" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Fetch and test PR #4</span>
@@ -1002,6 +1117,30 @@
 - <strong>Tool name</strong>: <code>claude-code-autoyes-test</code>
 - <strong>Installation</strong>: <code>uv tool install --from . --name claude-code-autoyes-test claude-code-autoyes</code>
 - <strong>Isolation</strong>: Won't conflict with your main installation</p>
+<h2 id="performance-analysis">Performance Analysis<a class="headerlink" href="#performance-analysis" title="Permanent link">&para;</a></h2>
+<h3 id="setup-performance-tools">Setup Performance Tools<a class="headerlink" href="#setup-performance-tools" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># Install optional performance dependencies</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>uv<span class="w"> </span>sync<span class="w"> </span>--extra<span class="w"> </span>performance
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="c1"># Verify py-spy installation</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>uv<span class="w"> </span>run<span class="w"> </span>py-spy<span class="w"> </span>--version
+</code></pre></div>
+<h3 id="performance-testing-workflow">Performance Testing Workflow<a class="headerlink" href="#performance-testing-workflow" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># Profile running TUI with py-spy</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>claude_code_autoyes<span class="w"> </span>debug<span class="w"> </span>profile<span class="w"> </span>-d<span class="w"> </span><span class="m">10</span><span class="w"> </span>-o<span class="w"> </span>/tmp/profile.svg
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="c1"># Profiling requires TUI to be running first</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>claude_code_autoyes<span class="w"> </span>tui<span class="w"> </span><span class="p">&amp;</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="nv">TUI_PID</span><span class="o">=</span><span class="nv">$!</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>claude_code_autoyes<span class="w"> </span>debug<span class="w"> </span>profile<span class="w"> </span>-d<span class="w"> </span><span class="m">10</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="nb">kill</span><span class="w"> </span><span class="nv">$TUI_PID</span>
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="c1"># Manual py-spy usage (requires sudo on macOS)</span>
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>sudo<span class="w"> </span>uv<span class="w"> </span>run<span class="w"> </span>py-spy<span class="w"> </span>record<span class="w"> </span>-p<span class="w"> </span><span class="nv">$TUI_PID</span><span class="w"> </span>-d<span class="w"> </span><span class="m">10</span><span class="w"> </span>-o<span class="w"> </span>/tmp/profile.svg
+<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>
+<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="c1"># Run performance test suite</span>
+<a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a>uv<span class="w"> </span>run<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span>tests/performance/<span class="w"> </span>-v
+</code></pre></div>
 <h2 id="daemon-testing">Daemon Testing<a class="headerlink" href="#daemon-testing" title="Permanent link">&para;</a></h2>
 <p>The daemon testing workflow:</p>
 <ol>
@@ -1014,50 +1153,50 @@
 </ol>
 <h2 id="manual-testing">Manual Testing<a class="headerlink" href="#manual-testing" title="Permanent link">&para;</a></h2>
 <p>For manual testing without make commands:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># Install test version</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>uv<span class="w"> </span>tool<span class="w"> </span>install<span class="w"> </span>--from<span class="w"> </span>.<span class="w"> </span>--name<span class="w"> </span>my-test-tool<span class="w"> </span>claude-code-autoyes
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="c1"># Test commands</span>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>my-test-tool<span class="w"> </span>status
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>my-test-tool<span class="w"> </span>daemon<span class="w"> </span>start
-<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>my-test-tool<span class="w"> </span>daemon<span class="w"> </span>status
-<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>
-<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="c1"># Clean up</span>
-<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>uv<span class="w"> </span>tool<span class="w"> </span>uninstall<span class="w"> </span>my-test-tool
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1"># Install test version</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>uv<span class="w"> </span>tool<span class="w"> </span>install<span class="w"> </span>--from<span class="w"> </span>.<span class="w"> </span>--name<span class="w"> </span>my-test-tool<span class="w"> </span>claude-code-autoyes
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="c1"># Test commands</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>my-test-tool<span class="w"> </span>status
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>my-test-tool<span class="w"> </span>daemon<span class="w"> </span>start
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>my-test-tool<span class="w"> </span>daemon<span class="w"> </span>status
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="c1"># Clean up</span>
+<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>uv<span class="w"> </span>tool<span class="w"> </span>uninstall<span class="w"> </span>my-test-tool
 </code></pre></div>
 <h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
 <h3 id="tool-installation-issues">Tool Installation Issues<a class="headerlink" href="#tool-installation-issues" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># If installation fails, try forcing reinstall</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>uv<span class="w"> </span>tool<span class="w"> </span>install<span class="w"> </span>--from<span class="w"> </span>.<span class="w"> </span>--force-reinstall<span class="w"> </span>--name<span class="w"> </span>claude-code-autoyes-test<span class="w"> </span>claude-code-autoyes
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># If installation fails, try forcing reinstall</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>uv<span class="w"> </span>tool<span class="w"> </span>install<span class="w"> </span>--from<span class="w"> </span>.<span class="w"> </span>--force-reinstall<span class="w"> </span>--name<span class="w"> </span>claude-code-autoyes-test<span class="w"> </span>claude-code-autoyes
 </code></pre></div>
 <h3 id="daemon-issues">Daemon Issues<a class="headerlink" href="#daemon-issues" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1"># Check if daemon is running</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>claude-code-autoyes-test<span class="w"> </span>daemon<span class="w"> </span>status
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="c1"># Check logs</span>
-<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>cat<span class="w"> </span>/tmp/claude-autoyes.log
-<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>
-<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="c1"># Kill any stuck processes</span>
-<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>pkill<span class="w"> </span>-f<span class="w"> </span>claude-autoyes
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1"># Check if daemon is running</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>claude-code-autoyes-test<span class="w"> </span>daemon<span class="w"> </span>status
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="c1"># Check logs</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>cat<span class="w"> </span>/tmp/claude-autoyes.log
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="c1"># Kill any stuck processes</span>
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>pkill<span class="w"> </span>-f<span class="w"> </span>claude-autoyes
 </code></pre></div>
 <h3 id="tmux-issues">Tmux Issues<a class="headerlink" href="#tmux-issues" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># List tmux sessions</span>
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>tmux<span class="w"> </span>list-sessions
-<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
-<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="c1"># Kill specific session</span>
-<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>tmux<span class="w"> </span>kill-session<span class="w"> </span>-t<span class="w"> </span>claude-test
-<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>
-<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="c1"># Kill all tmux sessions (careful!)</span>
-<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>tmux<span class="w"> </span>kill-server
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1"># List tmux sessions</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>tmux<span class="w"> </span>list-sessions
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="c1"># Kill specific session</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>tmux<span class="w"> </span>kill-session<span class="w"> </span>-t<span class="w"> </span>claude-test
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>
+<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="c1"># Kill all tmux sessions (careful!)</span>
+<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>tmux<span class="w"> </span>kill-server
 </code></pre></div>
 <h2 id="project-structure">Project Structure<a class="headerlink" href="#project-structure" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>claude-code-autoyes/
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>├── claude_code_autoyes/     # Main package
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>├── tests/                   # Test suite
-<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>├── scripts/                 # Development scripts (auto-generated)
-<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>├── docs/                    # Documentation
-<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>├── Makefile                 # Development commands
-<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>└── claude_code_autoyes.py   # UV script entry
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>claude-code-autoyes/
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>├── claude_code_autoyes/     # Main package
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>├── tests/                   # Test suite
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>├── scripts/                 # Development scripts (auto-generated)
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>├── docs/                    # Documentation
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>├── Makefile                 # Development commands
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>└── claude_code_autoyes.py   # UV script entry
 </code></pre></div>
 <h2 id="contributing">Contributing<a class="headerlink" href="#contributing" title="Permanent link">&para;</a></h2>
 <ol>

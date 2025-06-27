@@ -485,6 +485,15 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#performance-analysis" class="md-nav__link">
+    <span class="md-ellipsis">
+      Performance Analysis
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -839,6 +848,15 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#performance-analysis" class="md-nav__link">
+    <span class="md-ellipsis">
+      Performance Analysis
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1070,6 +1088,9 @@
 </code></pre></div></p>
 <p>Launch the interactive TUI:
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>claude-code-autoyes<span class="w"> </span>tui
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="c1"># Or with debug mode for performance monitoring</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>claude-code-autoyes<span class="w"> </span>tui<span class="w"> </span>--debug
 </code></pre></div></p>
 <p><em>[Screenshot placeholder: TUI interface showing Claude instances and controls]</em></p>
 <h3 id="daemon-control">Daemon Control<a class="headerlink" href="#daemon-control" title="Permanent link">&para;</a></h3>
@@ -1079,9 +1100,17 @@
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>claude-code-autoyes<span class="w"> </span>daemon<span class="w"> </span>status<span class="w">   </span><span class="c1"># Check status  </span>
 <a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>claude-code-autoyes<span class="w"> </span>daemon<span class="w"> </span>stop<span class="w">     </span><span class="c1"># Stop manually</span>
 </code></pre></div></p>
+<h3 id="performance-analysis">Performance Analysis<a class="headerlink" href="#performance-analysis" title="Permanent link">&para;</a></h3>
+<p>Profile TUI performance with py-spy:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>claude-code-autoyes<span class="w"> </span>debug<span class="w"> </span>profile<span class="w">          </span><span class="c1"># Profile with py-spy (requires setup)</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>claude-code-autoyes<span class="w"> </span>debug<span class="w"> </span>--help<span class="w">           </span><span class="c1"># See all debug options</span>
+</code></pre></div></p>
+<p>Install performance analysis tools:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>uv<span class="w"> </span>sync<span class="w"> </span>--extra<span class="w"> </span>performance
+</code></pre></div></p>
 <h2 id="interactive-tui">Interactive TUI<a class="headerlink" href="#interactive-tui" title="Permanent link">&para;</a></h2>
 <p>The Terminal User Interface provides a visual way to manage sessions:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>claude-code-autoyes<span class="w"> </span>tui
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>claude-code-autoyes<span class="w"> </span>tui
 </code></pre></div>
 <p><em>[Demo placeholder: Animated GIF showing TUI navigation and theme switching]</em></p>
 <p>Features:
@@ -1136,12 +1165,12 @@
 <h2 id="documentation">Documentation<a class="headerlink" href="#documentation" title="Permanent link">&para;</a></h2>
 <h3 id="viewing-documentation">Viewing Documentation<a class="headerlink" href="#viewing-documentation" title="Permanent link">&para;</a></h3>
 <p>Serve documentation locally:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>make<span class="w"> </span>docs-serve
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>make<span class="w"> </span>docs-serve
 </code></pre></div></p>
 <p>The documentation will be available at http://localhost:8000</p>
 <h3 id="building-documentation">Building Documentation<a class="headerlink" href="#building-documentation" title="Permanent link">&para;</a></h3>
 <p>Build static documentation:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>make<span class="w"> </span>docs-build
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>make<span class="w"> </span>docs-build
 </code></pre></div></p>
 <p>The built documentation will be in the <code>site/</code> directory.</p>
 <h2 id="development">Development<a class="headerlink" href="#development" title="Permanent link">&para;</a></h2>
@@ -1150,23 +1179,23 @@
 <ol>
 <li>
 <p>Clone the repository:
-   <div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/safurrier/claude-code-autoyes.git
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="nb">cd</span><span class="w"> </span>claude-code-autoyes
+   <div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/safurrier/claude-code-autoyes.git
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="nb">cd</span><span class="w"> </span>claude-code-autoyes
 </code></pre></div></p>
 </li>
 <li>
 <p>Set up the development environment:
-   <div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>make<span class="w"> </span>setup
+   <div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>make<span class="w"> </span>setup
 </code></pre></div></p>
 </li>
 <li>
 <p>Install development tools:
-   <div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>make<span class="w"> </span>dev-install
+   <div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>make<span class="w"> </span>dev-install
 </code></pre></div></p>
 </li>
 <li>
 <p>Run the tests to verify everything works:
-   <div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>make<span class="w"> </span><span class="nb">test</span>
+   <div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>make<span class="w"> </span><span class="nb">test</span>
 </code></pre></div></p>
 </li>
 </ol>
@@ -1175,7 +1204,7 @@
 <li>Make your changes to the code</li>
 <li>Add or update tests as needed</li>
 <li>Run quality checks:
-   <div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>make<span class="w"> </span>check
+   <div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>make<span class="w"> </span>check
 </code></pre></div></li>
 <li>Update documentation if needed</li>
 <li>Commit your changes</li>
@@ -1195,13 +1224,13 @@
 </ul>
 <h3 id="testing">Testing<a class="headerlink" href="#testing" title="Permanent link">&para;</a></h3>
 <p>Run the test suite:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>make<span class="w"> </span><span class="nb">test</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>make<span class="w"> </span><span class="nb">test</span>
 </code></pre></div></p>
 <p>Run specific tests:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>uv<span class="w"> </span>run<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span>tests/test_specific.py::test_function_name
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>uv<span class="w"> </span>run<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span>tests/test_specific.py::test_function_name
 </code></pre></div></p>
 <p>Run tests with coverage:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>make<span class="w"> </span>test-coverage
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>make<span class="w"> </span>test-coverage
 </code></pre></div></p>
 
 
