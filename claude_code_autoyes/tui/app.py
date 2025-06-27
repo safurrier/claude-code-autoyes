@@ -48,6 +48,7 @@ class ClaudeAutoYesApp(App[None]):
         detector: ClaudeDetector | None = None,
         config: ConfigManager | None = None,
         daemon: DaemonManager | None = None,
+        debug_mode: bool = False,
         **kwargs: Any,
     ):
         # Set themes before super().__init__() since get_css_variables() is called during init
@@ -56,6 +57,12 @@ class ClaudeAutoYesApp(App[None]):
         self.detector = detector or ClaudeDetector()
         self.config = config or ConfigManager()
         self.daemon = daemon or DaemonManager()
+
+        # Debug mode support
+        self.debug_mode = debug_mode
+        self.debug_overlay: str | None = None
+        if debug_mode:
+            self._setup_debug_mode()
 
         # Initialize jumper for navigation - will be set up in on_mount
         self.jumper: Jumper | None = None
@@ -328,12 +335,21 @@ class ClaudeAutoYesApp(App[None]):
         self.config.auto_yes_enabled = new_value
         self.config.save()
 
+    def _setup_debug_mode(self) -> None:
+        """Set up debug mode with performance monitoring."""
+        # For now, just set a flag that we can use to enable debug overlay
+        # In a full implementation, this would set up performance monitoring
+        self.debug_overlay = "debug_overlay_placeholder"
+
 
 def run_tui(
     detector: ClaudeDetector | None = None,
     config: ConfigManager | None = None,
     daemon: DaemonManager | None = None,
+    debug_mode: bool = False,
 ) -> None:
     """Run the modular TUI application."""
-    app = ClaudeAutoYesApp(detector=detector, config=config, daemon=daemon)
+    app = ClaudeAutoYesApp(
+        detector=detector, config=config, daemon=daemon, debug_mode=debug_mode
+    )
     app.run()

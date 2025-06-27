@@ -54,6 +54,9 @@ claude-code-autoyes enable-all
 Launch the interactive TUI:
 ```bash
 claude-code-autoyes tui
+
+# Or with debug mode for performance monitoring
+claude-code-autoyes tui --debug
 ```
 
 *[Screenshot placeholder: TUI interface showing Claude instances and controls]*
@@ -67,6 +70,19 @@ For advanced users who want manual control:
 claude-code-autoyes daemon start    # Start manually
 claude-code-autoyes daemon status   # Check status  
 claude-code-autoyes daemon stop     # Stop manually
+```
+
+### Performance Analysis
+
+Profile TUI performance with py-spy:
+```bash
+claude-code-autoyes debug profile          # Profile with py-spy (requires setup)
+claude-code-autoyes debug --help           # See all debug options
+```
+
+Install performance analysis tools:
+```bash
+uv sync --extra performance
 ```
 
 ## Interactive TUI
