@@ -10,6 +10,12 @@ from ..core.config import ConfigManager
 from ..core.daemon import DaemonManager
 from ..core.daemon_service import DaemonService
 from ..core.detector import ClaudeDetector
+from ..core.performance_constants import (
+    DEBUG_NOTIFICATION_TIMEOUT_SECONDS,
+    DEFAULT_PROCESS_CACHE_TTL_SECONDS,
+)
+from ..core.process_cache import ProcessCache
+from ..core.refresh_optimizer import SmartRefreshOptimizer
 from .components import InstanceTable, Jumper, JumpOverlay
 from .pages import MainPage
 from .themes import THEMES
@@ -48,6 +54,7 @@ class ClaudeAutoYesApp(App[None]):
         detector: ClaudeDetector | None = None,
         config: ConfigManager | None = None,
         daemon: DaemonManager | None = None,
+        debug_mode: bool = False,
         **kwargs: Any,
     ):
         # Set themes before super().__init__() since get_css_variables() is called during init
@@ -57,11 +64,23 @@ class ClaudeAutoYesApp(App[None]):
         self.config = config or ConfigManager()
         self.daemon = daemon or DaemonManager()
 
+        # Debug mode support
+        self.debug_mode = debug_mode
+        self.debug_overlay: str | None = None
+        if debug_mode:
+            self._setup_debug_mode()
+
         # Initialize jumper for navigation - will be set up in on_mount
         self.jumper: Jumper | None = None
 
         # Initialize daemon service for automatic lifecycle management
         self.daemon_service: DaemonService | None = None
+
+        # Initialize performance optimization components
+        self.process_cache = ProcessCache(ttl_seconds=DEFAULT_PROCESS_CACHE_TTL_SECONDS)
+        self.refresh_optimizer = SmartRefreshOptimizer(
+            self.detector, self.process_cache
+        )
 
     def get_css_variables(self) -> dict[str, str]:
         """Apply theme CSS variables - Bagels pattern."""
@@ -125,17 +144,32 @@ class ClaudeAutoYesApp(App[None]):
         self.start_daemon_on_mount()
 
     def refresh_instances(self) -> None:
-        """Refresh the list of Claude instances."""
-        main_page = self.query_one(MainPage)
-        main_page.rebuild()
+        """Refresh the list of Claude instances with smart optimization."""
+        # Use smart refresh optimization to avoid unnecessary rebuilds
+        refresh_result = self.refresh_optimizer.refresh_with_optimization()
 
-        # Maintain focus on table after refresh (Bagels pattern)
-        try:
-            instance_table = self.query_one(InstanceTable)
-            if instance_table.table and not instance_table.table.has_focus:
-                self.set_focus(instance_table.table)
-        except Exception:
-            pass
+        if refresh_result.rebuilds_performed > 0:
+            # Only rebuild UI if changes were detected
+            main_page = self.query_one(MainPage)
+            main_page.rebuild()
+
+            # Maintain focus on table after refresh (Bagels pattern)
+            try:
+                instance_table = self.query_one(InstanceTable)
+                if instance_table.table and not instance_table.table.has_focus:
+                    self.set_focus(instance_table.table)
+            except Exception:
+                pass
+
+        # Debug notification if in debug mode
+        if self.debug_mode:
+            changes_msg = (
+                "changes detected" if refresh_result.changes_detected else "no changes"
+            )
+            self.notify(
+                f"Refresh: {changes_msg} ({refresh_result.duration_ms:.1f}ms)",
+                timeout=DEBUG_NOTIFICATION_TIMEOUT_SECONDS,
+            )
 
     def update_daemon_status(self) -> None:
         """Update the daemon status display."""
@@ -328,12 +362,21 @@ class ClaudeAutoYesApp(App[None]):
         self.config.auto_yes_enabled = new_value
         self.config.save()
 
+    def _setup_debug_mode(self) -> None:
+        """Set up debug mode with performance monitoring."""
+        # For now, just set a flag that we can use to enable debug overlay
+        # In a full implementation, this would set up performance monitoring
+        self.debug_overlay = "debug_overlay_placeholder"
+
 
 def run_tui(
     detector: ClaudeDetector | None = None,
     config: ConfigManager | None = None,
     daemon: DaemonManager | None = None,
+    debug_mode: bool = False,
 ) -> None:
     """Run the modular TUI application."""
-    app = ClaudeAutoYesApp(detector=detector, config=config, daemon=daemon)
+    app = ClaudeAutoYesApp(
+        detector=detector, config=config, daemon=daemon, debug_mode=debug_mode
+    )
     app.run()

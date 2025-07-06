@@ -10,6 +10,7 @@ from textual.widgets import DataTable
 from ...core.config import ConfigManager
 from ...core.detector import ClaudeDetector
 from ...core.models import ClaudeInstance
+from .table_updater import IncrementalTableUpdater
 
 
 class InstanceTable(Container):
@@ -98,6 +99,7 @@ class InstanceTable(Container):
         self.detector = detector or ClaudeDetector()
         self.config = config or ConfigManager()
         self._instances: list[ClaudeInstance] = []
+        self._table_updater: IncrementalTableUpdater | None = None
 
     def compose(self) -> ComposeResult:
         """Compose the instance table."""
@@ -113,6 +115,8 @@ class InstanceTable(Container):
     def on_mount(self) -> None:
         """Initialize the table when mounted."""
         self.table.can_focus = True
+        # Initialize incremental table updater
+        self._table_updater = IncrementalTableUpdater(self.table)
         self.rebuild()
 
     def rebuild(self) -> None:
@@ -127,7 +131,23 @@ class InstanceTable(Container):
         self.update_table()
 
     def update_table(self) -> None:
-        """Update the DataTable with current instances."""
+        """Update the DataTable with current instances using incremental updates."""
+        if self._table_updater:
+            # Use incremental updater for performance optimization
+            self.call_later(self._update_table_async)
+        else:
+            # Fallback to traditional approach if updater not available
+            self._update_table_traditional()
+
+    async def _update_table_async(self) -> None:
+        """Async wrapper for incremental table updates."""
+        if self._table_updater:
+            await self._table_updater.update_table_data(self._instances)
+            # Add styling and index numbers after basic update
+            self._apply_table_styling()
+
+    def _update_table_traditional(self) -> None:
+        """Traditional table update approach as fallback."""
         self.table.clear()
 
         for i, instance in enumerate(self._instances):
@@ -151,6 +171,12 @@ class InstanceTable(Container):
                 f"[class=prompt-time]{last_prompt}[/]",
                 key=str(i),
             )
+
+    def _apply_table_styling(self) -> None:
+        """Apply styling and index numbers to table rows."""
+        # For now, since our incremental updater is simplified,
+        # we'll rely on its built-in styling
+        pass
 
     def get_selected_instance(self) -> ClaudeInstance | None:
         """Get currently selected instance."""

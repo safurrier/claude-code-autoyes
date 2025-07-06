@@ -2,6 +2,8 @@
 #    uv pip compile pyproject.toml -o requirements.txt
 click==8.2.1
     # via claude-code-autoyes (pyproject.toml)
+iniconfig==2.1.0
+    # via pytest
 linkify-it-py==2.0.3
     # via markdown-it-py
 markdown-it-py==3.0.0
@@ -13,10 +15,22 @@ mdit-py-plugins==0.4.2
     # via markdown-it-py
 mdurl==0.1.2
     # via markdown-it-py
+packaging==25.0
+    # via pytest
 platformdirs==4.3.8
     # via textual
+pluggy==1.6.0
+    # via pytest
+psutil==7.0.0
+    # via claude-code-autoyes (pyproject.toml)
 pygments==2.19.1
-    # via rich
+    # via
+    #   pytest
+    #   rich
+pytest==8.4.1
+    # via pytest-asyncio
+pytest-asyncio==1.0.0
+    # via claude-code-autoyes (pyproject.toml)
 rich==14.0.0
     # via textual
 textual==3.5.0

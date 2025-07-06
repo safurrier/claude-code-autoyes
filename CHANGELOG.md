@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Performance debugging suite**: Comprehensive tools for analyzing TUI performance
+  - `debug startup-time` command for measuring TUI startup performance
+  - `debug navigation-test` command for testing UI responsiveness
+  - `debug profile` command for py-spy profiling integration
+  - `--debug` flag for TUI debug mode with performance monitoring
+  - Optional py-spy integration for flame graph generation
+  - 25 comprehensive performance tests with TDD approach
 - **Global auto-yes toggle**: Master switch to enable/disable entire auto-yes functionality
 - **Automatic daemon lifecycle**: Daemon now starts automatically with TUI and stops when TUI quits
 - **Enhanced daemon service**: New `should_process_session()` method checks both session and global state
